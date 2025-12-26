@@ -3,24 +3,49 @@ import { openDatabase } from '../database/db.js';
 export async function getPublicRecaps() {
 	const db = await openDatabase();
 	try {
-		const recaps = await db.all(
-			`SELECT r.id, r.title, r.user_id, r.theme_id, r.visibility,
-              r.derived_from_recap_id, r.derived_from_author, r.derived_from_title,
-              r.created_at, r.updated_at,
-              u.username as author_username, u.name as author_name,
-              th.name as theme_name
-       FROM recaps r
-       JOIN users u ON r.user_id = u.id
-       JOIN themes th ON r.theme_id = th.id
-       WHERE r.visibility = 'public'
-       ORDER BY r.created_at DESC`
-		);
-		return recaps;
+		const recaps = await db.all(`
+            SELECT 
+                r.*,
+                u.username as author_username, 
+                u.name as author_name,
+                th.name as theme_name,
+                
+				--Uso funzioni Json che crea un array JSON delle pagine direttamente in SQL
+                json_group_array(
+                    json_object(
+                        'id', rp.id,
+                        'page_number', rp.page_number,
+                        'background_image_id', rp.background_image_id,
+                        'text_field_1', rp.text_field_1,
+                        'text_field_2', rp.text_field_2,
+                        'text_field_3', rp.text_field_3,
+                        'background_url', bi.url,
+                        'text_fields_count', bi.text_fields_count,
+                        'text_positions', json(bi.text_positions) -- json() serve per evitare doppio escape
+                    )
+                ) as pages
+            FROM recaps r
+            JOIN users u ON r.user_id = u.id
+            JOIN themes th ON r.theme_id = th.id
+            LEFT JOIN recap_pages rp ON r.id = rp.recap_id
+            LEFT JOIN background_images bi ON rp.background_image_id = bi.id
+            WHERE r.visibility = 'public'
+            GROUP BY r.id
+            ORDER BY r.created_at DESC
+        `);
+
+		// Parsiamo la stringa JSON restituita da SQLite
+		return recaps.map(recap => ({
+			...recap,
+			// Filtra elementi nulli se LEFT JOIN non trova match
+			pages: JSON.parse(recap.pages).filter(p => p.id !== null)
+				.sort((a, b) => a.page_number - b.page_number)
+		}));
+
 	} finally {
 		await db.close();
 	}
 }
-
 export async function getRecapsByUser(userId) {
 	const db = await openDatabase();
 	try {
