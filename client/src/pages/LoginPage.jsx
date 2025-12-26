@@ -67,6 +67,7 @@ function LoginPage() {
                   placeholder="Inserisci la tua password"
                   disabled={isPending}
                   className="input-password"
+                  autoComplete="current-password"
                 />
                 <span className="password-icon" onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
