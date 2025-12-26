@@ -1,68 +1,158 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* --- PALETTE "DEEP TEAL" (Ottanio) --- */
+  --primary-color: #0f766e;
+  --primary-hover: #115e59;
+  --accent-light: #ccfbf1;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --bg-app: #f1f5f9;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --input-height: 52px;
+  --navbar-height: 72px;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
+/* RESET */
 body {
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* --- NAVBAR STYLES  --- */
+.navbar-custom {
+  background-color: #ffffff;
+  height: var(--navbar-height);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
-button {
+.brand-text {
+  color: var(--primary-color);
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.5px;
+  text-decoration: none;
+}
+
+.nav-link-custom {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
+  margin-right: 2rem;
+  position: relative;
+  transition: color 0.2s;
+}
+
+/* Effetto Hover e Active */
+.nav-link-custom:hover,
+.nav-link-custom.active {
+  color: var(--primary-color);
+}
+
+/* Riga animata sotto al link attiva */
+.nav-link-custom::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--primary-color);
+  transition: width 0.3s ease;
+}
+.nav-link-custom.active::after {
+  width: 100%;
+}
+
+/* --- BOTTONI NAVBAR --- */
+.btn-outline-nav {
+  color: var(--text-muted);
+  border: 1px solid #cbd5e1;
+  background: transparent;
   border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
+  padding: 0.4rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
 }
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.btn-outline-nav:hover {
+  border-color: #dc3545;
+  color: #dc3545;
+  background: #fff;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* --- FORM CONTROLS --- */
+.form-control {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0 1.2rem;
+  min-height: var(--input-height);
+  font-size: 1rem;
+  color: var(--text-main);
+  transition: all 0.2s;
+}
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.15);
+}
+
+/* --- BOTTONI GENERALI --- */
+.btn-primary-custom {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  min-height: var(--input-height);
+  padding: 0 2rem;
+  transition: all 0.2s;
+}
+.btn-primary-custom:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  color: white;
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+}
+
+/* --- UTILS --- */
+.password-wrapper {
+  position: relative;
+}
+.password-icon {
+  position: absolute;
+  top: 50%;
+  right: 1.2rem;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #94a3b8;
+  display: flex;
+}
+.password-icon:hover {
+  color: var(--primary-color);
+}
+
+.login-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.05);
+}
+.text-primary-custom {
+  color: var(--primary-color);
+}
+.form-label-custom {
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  display: block;
+  text-transform: uppercase;
 }
