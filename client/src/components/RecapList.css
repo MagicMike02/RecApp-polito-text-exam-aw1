@@ -1,0 +1,40 @@
+.recap-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+  padding: 0 2rem;
+}
+.recap-list-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+.recap-list-empty {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+.recap-list-error {
+  color: var(--danger-color);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+.recap-list-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 4px solid var(--primary-color);
+  border-top: 4px solid var(--accent-light);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
