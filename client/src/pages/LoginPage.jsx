@@ -73,7 +73,7 @@ function LoginPage() {
                 </span>
               </div>
             </div>
-            <Button type="submit" className="login-btn" disabled={isPending}>
+            <Button type="submit" className="login-btn" disabled={isPending} variant="">
               {isPending ? "Accesso in corso..." : "Login"}
             </Button>
           </Form>

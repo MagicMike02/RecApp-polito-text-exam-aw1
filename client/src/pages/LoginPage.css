@@ -1,15 +1,17 @@
+/* --- LAYOUT LOGIN --- */
 .login-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 5rem;
-  margin-bottom: 5rem;
+  margin: 5rem 0;
+  min-height: 60vh;
 }
 
 .login-card-body {
   padding: 0;
 }
 
+/* --- HEADER & TITOLI --- */
 .login-header {
   text-align: center;
   margin-bottom: 1.5rem;
@@ -18,11 +20,12 @@
 .login-title {
   font-weight: 700;
   color: var(--primary-color);
+  margin: 0;
 }
 
+/* --- FORM ELEMENTS --- */
 .login-form {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
   width: 100%;
 }
 
@@ -34,7 +37,9 @@
   padding-right: 3rem;
 }
 
+/* --- BOTTONE LOGIN --- */
 .login-btn {
+  /* Stile Base */
   width: 100%;
   background-color: var(--primary-color);
   color: white;
@@ -42,26 +47,35 @@
   border-radius: 10px;
   font-weight: 600;
   min-height: var(--input-height);
+
+  /* Effetti */
   box-shadow: 0 4px 12px rgba(15, 118, 110, 0.15);
-  transition: all 0.2s;
-}
-.login-btn:hover {
-  background-color: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
-}
-.login-btn:active,
-.login-btn:focus {
-  background-color: var(--primary-hover) !important;
-  border-color: var(--primary-hover) !important;
-  color: white !important;
-  box-shadow: none !important;
-}
-.login-btn[disabled] {
-  opacity: 0.7;
+  transition: all 0.2s ease-in-out;
 }
 
+.login-btn:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(15, 118, 110, 0.25);
+}
+
+.login-btn:active,
+.login-btn:focus {
+  background-color: var(--primary-hover);
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.25);
+  outline: none;
+}
+
+.login-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --- FOOTER --- */
 .login-footer {
   margin-top: 1.5rem;
   text-align: center;
+  font-size: 0.9rem;
 }
