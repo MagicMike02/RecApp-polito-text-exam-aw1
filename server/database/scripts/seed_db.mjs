@@ -1,542 +1,309 @@
 /**
- * Database Seeding Script
- * Seeds essential data for testing:
- * - 3 Users (with hashed passwords)
+ * Database Seeding Script - COMPLETE & CLEAN
+ * * Includes all original data:
+ * - 3 Users
  * - 3 Themes
- * - 36 Background Images (12 per theme)
- * - 6 Templates (2 per theme)
- * - 9 Recaps (3 per user, mix public/private, with derivations)
- * 
- * Usage: node seed_db.mjs
+ * - 36 Background Images (Specific coordinates preserved)
+ * - 6 Templates
+ * - 9 Recaps (with derivation logic)
  */
 
-import { openDatabase } from '../db.js';
+import { openDatabase, getDatabasePath } from '../db.js';
 import { hashPassword } from '../../utils/crypto.js';
 
+// --- HELPER: Insert Data & Return ID ---
+async function insertAndGetId(db, table, data) {
+	const columns = Object.keys(data);
+	const values = Object.values(data);
+	const placeholders = values.map(() => '?').join(', ');
+	const sql = `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders})`;
+	const result = await db.run(sql, values);
+	return result.lastID;
+}
+
 async function seedDatabase() {
-	console.log('🌱 Starting database seeding...\n');
+	console.log(`🌱 Starting Full Database Seeding...`);
+	console.log(`📍 DB Path: ${getDatabasePath()}\n`);
 
 	const db = await openDatabase();
 
 	try {
-		// Check if data already exists
-		const existingUsers = await db.get('SELECT COUNT(*) as count FROM users');
-		if (existingUsers.count > 0) {
-			console.log('⚠️  Database already contains data. Skipping seeding.');
-			console.log('   To re-seed, delete database.sqlite and run create_tables.mjs first.\n');
-			await db.close();
+		// Safety Check
+		const check = await db.get('SELECT count(*) as c FROM users');
+		if (check.c > 0) {
+			console.log('⚠️  DB is not empty. Run "node create_tables.mjs" to reset first.');
 			return;
 		}
 
-		// ========================================
-		// SEED USERS
-		// ========================================
-		console.log('👥 Seeding users...');
+		// ==========================================
+		// 1. USERS
+		// ==========================================
+		console.log('👥 Seeding 3 Users...');
 
-		const users = [
+		const usersRaw = [
 			{ username: 'alice', password: 'Alice2025!', name: 'Alice Rossi' },
 			{ username: 'bob', password: 'Bob@2025', name: 'Bob Verdi' },
 			{ username: 'charlie', password: 'Charlie#2025', name: 'Charlie Bianchi' }
 		];
 
-		for (const user of users) {
-			const { salt, hash } = hashPassword(user.password);
-			await db.run(
-				`INSERT INTO users (username, password, salt, name) 
-         VALUES (?, ?, ?, ?)`,
-				[user.username, hash, salt, user.name]
-			);
-			console.log(`   ✓ Created user: ${user.username} (${user.name})`);
+		// Map to store User IDs: { 'alice': 1, 'bob': 2 ... }
+		const userIds = {};
+
+		for (const u of usersRaw) {
+			const { salt, hash } = hashPassword(u.password);
+			const id = await insertAndGetId(db, 'users', {
+				username: u.username,
+				password: hash,
+				salt: salt,
+				name: u.name
+			});
+			userIds[u.username] = id;
+			console.log(`   ✓ Created: ${u.username} (ID: ${id})`);
 		}
 
-		// ========================================
-		// SEED THEMES
-		// ========================================
-		console.log('\n🎨 Seeding themes...');
+		// ==========================================
+		// 2. THEMES
+		// ==========================================
+		console.log('\n🎨 Seeding 3 Themes...');
 
-		const themes = [
+		const themesRaw = [
+			{ id: 1, name: 'Viaggi', desc: 'I tuoi viaggi e avventure dell\'anno' },
+			{ id: 2, name: 'Musica', desc: 'I tuoi ascolti e concerti preferiti' },
+			{ id: 3, name: 'Libri', desc: 'Le tue letture e scoperte letterarie' }
+		];
+
+		// Map to store Theme IDs
+		const themeIds = {};
+
+		for (const t of themesRaw) {
+			const id = await insertAndGetId(db, 'themes', { name: t.name, description: t.desc });
+			themeIds[t.name] = id; // Store for reference
+			console.log(`   ✓ Created: ${t.name}`);
+		}
+
+		// ==========================================
+		// 3. BACKGROUND IMAGES (All 36 entries)
+		// ==========================================
+		console.log('\n🖼️  Seeding 36 Background Images...');
+
+		// NOTE: Layouts are stored as JS Objects here, stringified on insertion.
+		const allImages = [
+			// --- THEME 1: VIAGGI (1-12) ---
+			{ t: 1, f: 'travel_1.png', c: 1, pos: { fields: [{ x: 0.1, y: 0.1, w: 0.8, h: 0.2 }] } },
+			{ t: 1, f: 'travel_4.png', c: 1, pos: { fields: [{ x: 0.1, y: 0.4, w: 0.8, h: 0.2 }] } },
+			{ t: 1, f: 'travel_9.png', c: 1, pos: { fields: [{ x: 0.5, y: 0.2, w: 0.4, h: 0.3 }] } },
+			{ t: 1, f: 'travel_10.png', c: 1, pos: { fields: [{ x: 0.1, y: 0.4, w: 0.8, h: 0.2 }] } },
+			{ t: 1, f: 'travel_2.png', c: 2, pos: { fields: [{ x: 0.1, y: 0.1, w: 0.8, h: 0.15 }, { x: 0.1, y: 0.75, w: 0.8, h: 0.15 }] } },
+			{ t: 1, f: 'travel_5.png', c: 2, pos: { fields: [{ x: 0.1, y: 0.2, w: 0.5, h: 0.2 }, { x: 0.1, y: 0.6, w: 0.5, h: 0.2 }] } },
+			{ t: 1, f: 'travel_7.png', c: 2, pos: { fields: [{ x: 0.1, y: 0.05, w: 0.8, h: 0.15 }, { x: 0.1, y: 0.8, w: 0.8, h: 0.15 }] } },
+			{ t: 1, f: 'travel_12.png', c: 2, pos: { fields: [{ x: 0.2, y: 0.3, w: 0.6, h: 0.15 }, { x: 0.2, y: 0.5, w: 0.6, h: 0.15 }] } },
+			{ t: 1, f: 'travel_3.png', c: 3, pos: { fields: [{ x: 0.5, y: 0.1, w: 0.4, h: 0.2 }, { x: 0.5, y: 0.4, w: 0.4, h: 0.2 }, { x: 0.5, y: 0.7, w: 0.4, h: 0.2 }] } },
+			{ t: 1, f: 'travel_6.png', c: 3, pos: { fields: [{ x: 0.1, y: 0.1, w: 0.3, h: 0.15 }, { x: 0.4, y: 0.1, w: 0.3, h: 0.15 }, { x: 0.7, y: 0.1, w: 0.3, h: 0.15 }] } },
+			{ t: 1, f: 'travel_8.png', c: 3, pos: { fields: [{ x: 0.05, y: 0.7, w: 0.25, h: 0.2 }, { x: 0.35, y: 0.7, w: 0.25, h: 0.2 }, { x: 0.65, y: 0.7, w: 0.25, h: 0.2 }] } },
+			{ t: 1, f: 'travel_11.png', c: 3, pos: { fields: [{ x: 0.1, y: 0.1, w: 0.8, h: 0.1 }, { x: 0.1, y: 0.25, w: 0.8, h: 0.1 }, { x: 0.1, y: 0.8, w: 0.8, h: 0.1 }] } },
+
+			// --- THEME 2: MUSICA (13-24) ---
+			{ t: 2, f: 'music_2.png', c: 1, pos: { fields: [{ x: 0.1, y: 0.7, w: 0.8, h: 0.2 }] } },
+			{ t: 2, f: 'music_4.png', c: 1, pos: { fields: [{ x: 0.1, y: 0.4, w: 0.8, h: 0.2 }] } },
+			{ t: 2, f: 'music_11.png', c: 1, pos: { fields: [{ x: 0.05, y: 0.1, w: 0.5, h: 0.3 }] } },
+			{ t: 2, f: 'music_12.png', c: 1, pos: { fields: [{ x: 0.2, y: 0.4, w: 0.6, h: 0.2 }] } },
+			{ t: 2, f: 'music_1.png', c: 2, pos: { fields: [{ x: 0.5, y: 0.2, w: 0.4, h: 0.2 }, { x: 0.5, y: 0.6, w: 0.4, h: 0.2 }] } },
+			{ t: 2, f: 'music_5.png', c: 2, pos: { fields: [{ x: 0.1, y: 0.1, w: 0.8, h: 0.15 }, { x: 0.4, y: 0.4, w: 0.5, h: 0.15 }] } },
+			{ t: 2, f: 'music_6.png', c: 2, pos: { fields: [{ x: 0.05, y: 0.1, w: 0.4, h: 0.8 }, { x: 0.55, y: 0.1, w: 0.4, h: 0.8 }] } },
+			{ t: 2, f: 'music_8.png', c: 2, pos: { fields: [{ x: 0.1, y: 0.7, w: 0.35, h: 0.2 }, { x: 0.55, y: 0.7, w: 0.35, h: 0.2 }] } },
+			{ t: 2, f: 'music_3.png', c: 3, pos: { fields: [{ x: 0.1, y: 0.1, w: 0.25, h: 0.2 }, { x: 0.1, y: 0.4, w: 0.25, h: 0.2 }, { x: 0.1, y: 0.7, w: 0.25, h: 0.2 }] } },
+			{ t: 2, f: 'music_7.png', c: 3, pos: { fields: [{ x: 0.1, y: 0.05, w: 0.8, h: 0.1 }, { x: 0.1, y: 0.15, w: 0.8, h: 0.1 }, { x: 0.1, y: 0.85, w: 0.8, h: 0.1 }] } },
+			{ t: 2, f: 'music_9.png', c: 3, pos: { fields: [{ x: 0.4, y: 0.2, w: 0.5, h: 0.15 }, { x: 0.4, y: 0.45, w: 0.5, h: 0.15 }, { x: 0.4, y: 0.7, w: 0.5, h: 0.15 }] } },
+			{ t: 2, f: 'music_10.png', c: 3, pos: { fields: [{ x: 0.05, y: 0.05, w: 0.3, h: 0.2 }, { x: 0.35, y: 0.05, w: 0.3, h: 0.2 }, { x: 0.65, y: 0.05, w: 0.3, h: 0.2 }] } },
+
+			// --- THEME 3: LIBRI (25-36) ---
+			{ t: 3, f: 'books_1.png', c: 1, pos: { fields: [{ x: 0.55, y: 0.2, w: 0.35, h: 0.6 }] } },
+			{ t: 3, f: 'books_4.png', c: 1, pos: { fields: [{ x: 0.1, y: 0.1, w: 0.4, h: 0.5 }] } },
+			{ t: 3, f: 'books_10.png', c: 1, pos: { fields: [{ x: 0.1, y: 0.4, w: 0.8, h: 0.2 }] } },
+			{ t: 3, f: 'books_12.png', c: 1, pos: { fields: [{ x: 0.2, y: 0.2, w: 0.6, h: 0.2 }] } },
+			{ t: 3, f: 'books_2.png', c: 2, pos: { fields: [{ x: 0.05, y: 0.05, w: 0.4, h: 0.15 }, { x: 0.55, y: 0.8, w: 0.4, h: 0.15 }] } },
+			{ t: 3, f: 'books_5.png', c: 2, pos: { fields: [{ x: 0.1, y: 0.2, w: 0.8, h: 0.2 }, { x: 0.1, y: 0.6, w: 0.8, h: 0.2 }] } },
+			{ t: 3, f: 'books_6.png', c: 2, pos: { fields: [{ x: 0.5, y: 0.1, w: 0.4, h: 0.3 }, { x: 0.5, y: 0.5, w: 0.4, h: 0.3 }] } },
+			{ t: 3, f: 'books_8.png', c: 2, pos: { fields: [{ x: 0.1, y: 0.3, w: 0.8, h: 0.15 }, { x: 0.1, y: 0.55, w: 0.8, h: 0.15 }] } },
+			{ t: 3, f: 'books_3.png', c: 3, pos: { fields: [{ x: 0.6, y: 0.1, w: 0.3, h: 0.2 }, { x: 0.6, y: 0.4, w: 0.3, h: 0.2 }, { x: 0.6, y: 0.7, w: 0.3, h: 0.2 }] } },
+			{ t: 3, f: 'books_7.png', c: 3, pos: { fields: [{ x: 0.1, y: 0.1, w: 0.8, h: 0.1 }, { x: 0.1, y: 0.45, w: 0.8, h: 0.1 }, { x: 0.1, y: 0.8, w: 0.8, h: 0.1 }] } },
+			{ t: 3, f: 'books_9.png', c: 3, pos: { fields: [{ x: 0.05, y: 0.75, w: 0.25, h: 0.2 }, { x: 0.35, y: 0.75, w: 0.25, h: 0.2 }, { x: 0.65, y: 0.75, w: 0.25, h: 0.2 }] } },
+			{ t: 3, f: 'books_11.png', c: 3, pos: { fields: [{ x: 0.1, y: 0.05, w: 0.3, h: 0.2 }, { x: 0.1, y: 0.35, w: 0.3, h: 0.2 }, { x: 0.1, y: 0.65, w: 0.3, h: 0.2 }] } }
+		];
+
+		let bgCounter = 0;
+		for (const img of allImages) {
+			const themeName = img.t === 1 ? 'viaggi' : (img.t === 2 ? 'musica' : 'libri');
+			await insertAndGetId(db, 'background_images', {
+				theme_id: img.t,
+				url: `/images/${themeName}/${img.f}`,
+				text_fields_count: img.c,
+				text_positions: JSON.stringify(img.pos)
+			});
+			bgCounter++;
+		}
+		console.log(`   ✓ Inserted ${bgCounter} images correctly`);
+
+		// ==========================================
+		// 4. TEMPLATES (All 6 Templates)
+		// ==========================================
+		console.log('\n📄 Seeding 6 Templates...');
+
+		const templatesRaw = [
+			// Theme 1: Viaggi
 			{
-				name: 'Viaggi',
-				description: 'I tuoi viaggi e avventure dell\'anno'
+				t_id: 1, name: 'Viaggi Estivi 2024', desc: 'Template per raccontare le tue avventure estive',
+				pages: [{ bg: 1, t: ['Le mie Avventure 2024'] }, { bg: 5, t: ['15 Paesi Visitati', '3 Continenti Esplorati'] }, { bg: 9, t: ['Cibo Locale', 'Nuove Amicizie', 'Ricordi Indimenticabili'] }]
 			},
 			{
-				name: 'Musica',
-				description: 'I tuoi ascolti e concerti preferiti'
+				t_id: 1, name: 'Road Trip Adventure', desc: 'Per i tuoi viaggi on the road',
+				pages: [{ bg: 2, t: ['On the Road'] }, { bg: 7, t: ['5000 km percorsi', 'Libertà totale'] }, { bg: 10, t: ['Musica a palla', 'Tramonti mozzafiato', 'Zero programmi'] }]
+			},
+
+			// Theme 2: Musica
+			{
+				t_id: 2, name: 'Le Mie Hit 2024', desc: 'Le canzoni che hanno segnato il tuo anno',
+				pages: [{ bg: 13, t: ['La Mia Musica 2024'] }, { bg: 17, t: ['1.234 ore di ascolto', '847 canzoni diverse'] }, { bg: 21, t: ['Rock 45%', 'Pop 30%', 'Jazz 25%'] }]
 			},
 			{
-				name: 'Libri',
-				description: 'Le tue letture e scoperte letterarie'
+				t_id: 2, name: 'Concerti Live', desc: 'I concerti più belli dell\'anno',
+				pages: [{ bg: 14, t: ['Live Music 2024'] }, { bg: 18, t: ['12 Concerti', 'Emozioni Pure'] }, { bg: 22, t: ['Rock al Forum', 'Jazz Festival', 'Indie sotto le stelle'] }]
+			},
+
+			// Theme 3: Libri
+			{
+				t_id: 3, name: 'I Miei Libri 2024', desc: 'Le letture che ti hanno appassionato',
+				pages: [{ bg: 25, t: ['Un Anno di Letture'] }, { bg: 29, t: ['24 libri letti', '8.500 pagine'] }, { bg: 33, t: ['Romanzi', 'Saggi', 'Poesia'] }]
+			},
+			{
+				t_id: 3, name: 'Scoperte Letterarie', desc: 'Nuovi autori e generi scoperti',
+				pages: [{ bg: 26, t: ['Nuove Scoperte'] }, { bg: 30, t: ['5 nuovi autori', '3 generi diversi'] }, { bg: 34, t: ['Fantasy', 'Thriller', 'Classici'] }]
 			}
 		];
 
-		for (const theme of themes) {
-			await db.run(
-				`INSERT INTO themes (name, description) 
-         VALUES (?, ?)`,
-				[theme.name, theme.description]
-			);
-			console.log(`   ✓ Created theme: ${theme.name}`);
+		for (const tmpl of templatesRaw) {
+			const tmplId = await insertAndGetId(db, 'templates', { theme_id: tmpl.t_id, name: tmpl.name, description: tmpl.desc });
+			let pNum = 1;
+			for (const p of tmpl.pages) {
+				await insertAndGetId(db, 'template_pages', {
+					template_id: tmplId, page_number: pNum++, background_image_id: p.bg,
+					text_field_1: p.t[0] || null, text_field_2: p.t[1] || null, text_field_3: p.t[2] || null
+				});
+			}
 		}
+		console.log(`   ✓ Templates and pages created`);
 
-		// ========================================
-		// SEED BACKGROUND IMAGES
-		// ========================================
-		console.log('\n🖼️  Seeding background images...');
+		// ==========================================
+		// 5. RECAPS (All 9 Recaps + Derivations)
+		// ==========================================
+		console.log('\n📝 Seeding 9 Recaps (including derived ones)...');
 
-		// Theme 1: Viaggi (Travel) - IDs will be 1-12
-		const travelImages = [
-			{ file: '/images/viaggi/travel_1.png', fields: 1, positions: '{"fields":[{"x":0.1,"y":0.1,"w":0.8,"h":0.2}]}' },
-			{ file: '/images/viaggi/travel_4.png', fields: 1, positions: '{"fields":[{"x":0.1,"y":0.4,"w":0.8,"h":0.2}]}' },
-			{ file: '/images/viaggi/travel_9.png', fields: 1, positions: '{"fields":[{"x":0.5,"y":0.2,"w":0.4,"h":0.3}]}' },
-			{ file: '/images/viaggi/travel_10.png', fields: 1, positions: '{"fields":[{"x":0.1,"y":0.4,"w":0.8,"h":0.2}]}' },
-			{ file: '/images/viaggi/travel_2.png', fields: 2, positions: '{"fields":[{"x":0.1,"y":0.1,"w":0.8,"h":0.15},{"x":0.1,"y":0.75,"w":0.8,"h":0.15}]}' },
-			{ file: '/images/viaggi/travel_5.png', fields: 2, positions: '{"fields":[{"x":0.1,"y":0.2,"w":0.5,"h":0.2},{"x":0.1,"y":0.6,"w":0.5,"h":0.2}]}' },
-			{ file: '/images/viaggi/travel_7.png', fields: 2, positions: '{"fields":[{"x":0.1,"y":0.05,"w":0.8,"h":0.15},{"x":0.1,"y":0.8,"w":0.8,"h":0.15}]}' },
-			{ file: '/images/viaggi/travel_12.png', fields: 2, positions: '{"fields":[{"x":0.2,"y":0.3,"w":0.6,"h":0.15},{"x":0.2,"y":0.5,"w":0.6,"h":0.15}]}' },
-			{ file: '/images/viaggi/travel_3.png', fields: 3, positions: '{"fields":[{"x":0.5,"y":0.1,"w":0.4,"h":0.2},{"x":0.5,"y":0.4,"w":0.4,"h":0.2},{"x":0.5,"y":0.7,"w":0.4,"h":0.2}]}' },
-			{ file: '/images/viaggi/travel_6.png', fields: 3, positions: '{"fields":[{"x":0.1,"y":0.1,"w":0.3,"h":0.15},{"x":0.4,"y":0.1,"w":0.3,"h":0.15},{"x":0.7,"y":0.1,"w":0.3,"h":0.15}]}' },
-			{ file: '/images/viaggi/travel_8.png', fields: 3, positions: '{"fields":[{"x":0.05,"y":0.7,"w":0.25,"h":0.2},{"x":0.35,"y":0.7,"w":0.25,"h":0.2},{"x":0.65,"y":0.7,"w":0.25,"h":0.2}]}' },
-			{ file: '/images/viaggi/travel_11.png', fields: 3, positions: '{"fields":[{"x":0.1,"y":0.1,"w":0.8,"h":0.1},{"x":0.1,"y":0.25,"w":0.8,"h":0.1},{"x":0.1,"y":0.8,"w":0.8,"h":0.1}]}' }
+		// We use a key-based approach to handle derivations
+		// Order matters: Parents first, then Derived.
+		const recapsRaw = [
+			// --- ALICE ---
+			{
+				key: 'a1', u: 'alice', t: 1, title: 'Estate in Italia', vis: 'public',
+				pages: [{ bg: 1, t: ['La mia Estate Italiana'] }, { bg: 5, t: ['Da Nord a Sud', '20 Città Visitate'] }, { bg: 9, t: ['Pizza napoletana', 'Gelato artigianale', 'Pasta al pesto'] }]
+			},
+			{
+				key: 'a2', u: 'alice', t: 2, title: 'Rock Year 2024', vis: 'public',
+				pages: [{ bg: 13, t: ['Il mio Anno Rock'] }, { bg: 17, t: ['2.000 ore di rock', '500 band diverse'] }, { bg: 21, t: ['Classic Rock', 'Alternative', 'Hard Rock'] }]
+			},
+			{
+				key: 'a3', u: 'alice', t: 3, title: 'Letture Personali', vis: 'private',
+				pages: [{ bg: 25, t: ['I miei momenti di lettura'] }, { bg: 29, t: ['15 romanzi', '3.200 pagine'] }, { bg: 33, t: ['Gialli', 'Storici', 'Contemporanei'] }]
+			},
+
+			// --- BOB ---
+			{
+				key: 'b1', u: 'bob', t: 2, title: 'Concerti Indimenticabili', vis: 'public',
+				pages: [{ bg: 14, t: ['Live 2024'] }, { bg: 18, t: ['8 Concerti Live', 'Pura Magia'] }, { bg: 22, t: ['Coldplay a Milano', 'Ed Sheeran a Roma', 'Vasco a Bari'] }]
+			},
+			// DERIVED: Bob from Alice (a1)
+			{
+				key: 'b2', u: 'bob', t: 1, title: 'Il mio Tour del Sud', vis: 'public', derivesFrom: 'a1',
+				pages: [{ bg: 2, t: ['Alla scoperta del Sud'] }, { bg: 6, t: ['Puglia e Calabria', 'Mare cristallino'] }, { bg: 11, t: ['Orecchiette', 'Taralli', 'Focaccia barese'] }]
+			},
+			{
+				key: 'b3', u: 'bob', t: 3, title: 'Letture Estive', vis: 'private',
+				pages: [{ bg: 27, t: ['Estate di letture'] }, { bg: 31, t: ['10 libri sotto l\'ombrellone', '2.800 pagine'] }, { bg: 35, t: ['Thriller', 'Fantasy', 'Avventura'] }]
+			},
+
+			// --- CHARLIE ---
+			{
+				key: 'c1', u: 'charlie', t: 3, title: 'Anno di Scoperte Letterarie', vis: 'public',
+				pages: [{ bg: 26, t: ['Scoprire Nuovi Mondi'] }, { bg: 30, t: ['30 libri', '10.000 pagine'] }, { bg: 34, t: ['Sci-fi', 'Distopie', 'Biografie'] }]
+			},
+			// DERIVED: Charlie from Bob (b1)
+			{
+				key: 'c2', u: 'charlie', t: 2, title: 'Festival Musicali 2024', vis: 'public', derivesFrom: 'b1',
+				pages: [{ bg: 15, t: ['Summer Festivals'] }, { bg: 19, t: ['5 Festival', 'Musica e Natura'] }, { bg: 23, t: ['Indie Rock', 'Elettronica', 'World Music'] }]
+			},
+			{
+				key: 'c3', u: 'charlie', t: 1, title: 'Weekend Fuori Porta', vis: 'private',
+				pages: [{ bg: 3, t: ['Piccole Fughe'] }, { bg: 8, t: ['12 weekend', '8 regioni'] }, { bg: 12, t: ['Montagna', 'Lago', 'Borghi storici'] }]
+			}
 		];
 
-		for (const img of travelImages) {
-			await db.run(
-				`INSERT INTO background_images (theme_id, url, text_fields_count, text_positions) 
-         VALUES (?, ?, ?, ?)`,
-				[1, img.file, img.fields, img.positions]
-			);
+		// Store generated Recap IDs for derivation lookup
+		const recapMap = {}; // { 'a1': 1, 'b1': 4 ... }
+		// Store Recap Objects to get parent details (author/title)
+		const recapDataMap = {};
+
+		for (const r of recapsRaw) {
+			const userId = userIds[r.u];
+			const recapPayload = {
+				user_id: userId,
+				theme_id: r.t,
+				title: r.title,
+				visibility: r.vis
+			};
+
+			// Handle Derivation
+			if (r.derivesFrom) {
+				const parentId = recapMap[r.derivesFrom];
+				const parentRecap = recapDataMap[r.derivesFrom];
+				const parentAuthorName = usersRaw.find(u => u.username === parentRecap.u).name;
+
+				if (parentId) {
+					recapPayload.derived_from_recap_id = parentId;
+					recapPayload.derived_from_author = parentAuthorName;
+					recapPayload.derived_from_title = parentRecap.title;
+				}
+			}
+
+			// Insert Recap
+			const rId = await insertAndGetId(db, 'recaps', recapPayload);
+			recapMap[r.key] = rId;
+			recapDataMap[r.key] = r;
+
+			// Insert Pages
+			let pNum = 1;
+			for (const p of r.pages) {
+				await insertAndGetId(db, 'recap_pages', {
+					recap_id: rId,
+					page_number: pNum++,
+					background_image_id: p.bg,
+					text_field_1: p.t[0] || null,
+					text_field_2: p.t[1] || null,
+					text_field_3: p.t[2] || null
+				});
+			}
+			console.log(`   ✓ Recap: "${r.title}" by ${r.u} ${r.derivesFrom ? '(Derived)' : ''}`);
 		}
-		console.log(`   ✓ Created 12 background images for Viaggi theme`);
 
-		// Theme 2: Musica (Music) - IDs will be 13-24
-		const musicImages = [
-			{ file: '/images/musica/music_2.png', fields: 1, positions: '{"fields":[{"x":0.1,"y":0.7,"w":0.8,"h":0.2}]}' },
-			{ file: '/images/musica/music_4.png', fields: 1, positions: '{"fields":[{"x":0.1,"y":0.4,"w":0.8,"h":0.2}]}' },
-			{ file: '/images/musica/music_11.png', fields: 1, positions: '{"fields":[{"x":0.05,"y":0.1,"w":0.5,"h":0.3}]}' },
-			{ file: '/images/musica/music_12.png', fields: 1, positions: '{"fields":[{"x":0.2,"y":0.4,"w":0.6,"h":0.2}]}' },
-			{ file: '/images/musica/music_1.png', fields: 2, positions: '{"fields":[{"x":0.5,"y":0.2,"w":0.4,"h":0.2},{"x":0.5,"y":0.6,"w":0.4,"h":0.2}]}' },
-			{ file: '/images/musica/music_5.png', fields: 2, positions: '{"fields":[{"x":0.1,"y":0.1,"w":0.8,"h":0.15},{"x":0.4,"y":0.4,"w":0.5,"h":0.15}]}' },
-			{ file: '/images/musica/music_6.png', fields: 2, positions: '{"fields":[{"x":0.05,"y":0.1,"w":0.4,"h":0.8},{"x":0.55,"y":0.1,"w":0.4,"h":0.8}]}' },
-			{ file: '/images/musica/music_8.png', fields: 2, positions: '{"fields":[{"x":0.1,"y":0.7,"w":0.35,"h":0.2},{"x":0.55,"y":0.7,"w":0.35,"h":0.2}]}' },
-			{ file: '/images/musica/music_3.png', fields: 3, positions: '{"fields":[{"x":0.1,"y":0.1,"w":0.25,"h":0.2},{"x":0.1,"y":0.4,"w":0.25,"h":0.2},{"x":0.1,"y":0.7,"w":0.25,"h":0.2}]}' },
-			{ file: '/images/musica/music_7.png', fields: 3, positions: '{"fields":[{"x":0.1,"y":0.05,"w":0.8,"h":0.1},{"x":0.1,"y":0.15,"w":0.8,"h":0.1},{"x":0.1,"y":0.85,"w":0.8,"h":0.1}]}' },
-			{ file: '/images/musica/music_9.png', fields: 3, positions: '{"fields":[{"x":0.4,"y":0.2,"w":0.5,"h":0.15},{"x":0.4,"y":0.45,"w":0.5,"h":0.15},{"x":0.4,"y":0.7,"w":0.5,"h":0.15}]}' },
-			{ file: '/images/musica/music_10.png', fields: 3, positions: '{"fields":[{"x":0.05,"y":0.05,"w":0.3,"h":0.2},{"x":0.35,"y":0.05,"w":0.3,"h":0.2},{"x":0.65,"y":0.05,"w":0.3,"h":0.2}]}' }
-		];
+		console.log('\n🎉 SEEDING COMPLETE! All data restored successfully.');
+		console.log('----------------------------------------------------');
+		console.log(`Users: 3 | Themes: 3 | Backgrounds: 36`);
+		console.log(`Templates: 6 | Recaps: 9 (2 Derived)`);
 
-		for (const img of musicImages) {
-			await db.run(
-				`INSERT INTO background_images (theme_id, url, text_fields_count, text_positions) 
-         VALUES (?, ?, ?, ?)`,
-				[2, img.file, img.fields, img.positions]
-			);
-		}
-		console.log(`   ✓ Created 12 background images for Musica theme`);
-
-		// Theme 3: Libri (Books) - IDs will be 25-36
-		const booksImages = [
-			{ file: '/images/libri/books_1.png', fields: 1, positions: '{"fields":[{"x":0.55,"y":0.2,"w":0.35,"h":0.6}]}' },
-			{ file: '/images/libri/books_4.png', fields: 1, positions: '{"fields":[{"x":0.1,"y":0.1,"w":0.4,"h":0.5}]}' },
-			{ file: '/images/libri/books_10.png', fields: 1, positions: '{"fields":[{"x":0.1,"y":0.4,"w":0.8,"h":0.2}]}' },
-			{ file: '/images/libri/books_12.png', fields: 1, positions: '{"fields":[{"x":0.2,"y":0.2,"w":0.6,"h":0.2}]}' },
-			{ file: '/images/libri/books_2.png', fields: 2, positions: '{"fields":[{"x":0.05,"y":0.05,"w":0.4,"h":0.15},{"x":0.55,"y":0.8,"w":0.4,"h":0.15}]}' },
-			{ file: '/images/libri/books_5.png', fields: 2, positions: '{"fields":[{"x":0.1,"y":0.2,"w":0.8,"h":0.2},{"x":0.1,"y":0.6,"w":0.8,"h":0.2}]}' },
-			{ file: '/images/libri/books_6.png', fields: 2, positions: '{"fields":[{"x":0.5,"y":0.1,"w":0.4,"h":0.3},{"x":0.5,"y":0.5,"w":0.4,"h":0.3}]}' },
-			{ file: '/images/libri/books_8.png', fields: 2, positions: '{"fields":[{"x":0.1,"y":0.3,"w":0.8,"h":0.15},{"x":0.1,"y":0.55,"w":0.8,"h":0.15}]}' },
-			{ file: '/images/libri/books_3.png', fields: 3, positions: '{"fields":[{"x":0.6,"y":0.1,"w":0.3,"h":0.2},{"x":0.6,"y":0.4,"w":0.3,"h":0.2},{"x":0.6,"y":0.7,"w":0.3,"h":0.2}]}' },
-			{ file: '/images/libri/books_7.png', fields: 3, positions: '{"fields":[{"x":0.1,"y":0.1,"w":0.8,"h":0.1},{"x":0.1,"y":0.45,"w":0.8,"h":0.1},{"x":0.1,"y":0.8,"w":0.8,"h":0.1}]}' },
-			{ file: '/images/libri/books_9.png', fields: 3, positions: '{"fields":[{"x":0.05,"y":0.75,"w":0.25,"h":0.2},{"x":0.35,"y":0.75,"w":0.25,"h":0.2},{"x":0.65,"y":0.75,"w":0.25,"h":0.2}]}' },
-			{ file: '/images/libri/books_11.png', fields: 3, positions: '{"fields":[{"x":0.1,"y":0.05,"w":0.3,"h":0.2},{"x":0.1,"y":0.35,"w":0.3,"h":0.2},{"x":0.1,"y":0.65,"w":0.3,"h":0.2}]}' }
-		];
-
-		for (const img of booksImages) {
-			await db.run(
-				`INSERT INTO background_images (theme_id, url, text_fields_count, text_positions) 
-         VALUES (?, ?, ?, ?)`,
-				[3, img.file, img.fields, img.positions]
-			);
-		}
-		console.log(`   ✓ Created 12 background images for Libri theme`);
-
-		// ========================================
-		// SEED TEMPLATES
-		// ========================================
-		console.log('\n📄 Seeding templates...');
-
-		// Template 1: Viaggi Estivi (Theme: Viaggi)
-		await db.run(
-			`INSERT INTO templates (theme_id, name, description) 
-       VALUES (?, ?, ?)`,
-			[1, 'Viaggi Estivi 2024', 'Template per raccontare le tue avventure estive']
-		);
-		// Pages for Template 1 (uses images 1, 5, 9 from Viaggi theme)
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[1, 1, 1, 'Le mie Avventure 2024']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[1, 2, 5, '15 Paesi Visitati', '3 Continenti Esplorati']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[1, 3, 9, 'Cibo Locale', 'Nuove Amicizie', 'Ricordi Indimenticabili']
-		);
-
-		// Template 2: Road Trip (Theme: Viaggi)
-		await db.run(
-			`INSERT INTO templates (theme_id, name, description) 
-       VALUES (?, ?, ?)`,
-			[1, 'Road Trip Adventure', 'Per i tuoi viaggi on the road']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[2, 1, 2, 'On the Road']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[2, 2, 7, '5000 km percorsi', 'Libertà totale']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[2, 3, 10, 'Musica a palla', 'Tramonti mozzafiato', 'Zero programmi']
-		);
-
-		// Template 3: Top Songs (Theme: Musica)
-		await db.run(
-			`INSERT INTO templates (theme_id, name, description) 
-       VALUES (?, ?, ?)`,
-			[2, 'Le Mie Hit 2024', 'Le canzoni che hanno segnato il tuo anno']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[3, 1, 13, 'La Mia Musica 2024']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[3, 2, 17, '1.234 ore di ascolto', '847 canzoni diverse']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[3, 3, 21, 'Rock 45%', 'Pop 30%', 'Jazz 25%']
-		);
-
-		// Template 4: Live Concerts (Theme: Musica)
-		await db.run(
-			`INSERT INTO templates (theme_id, name, description) 
-       VALUES (?, ?, ?)`,
-			[2, 'Concerti Live', 'I concerti più belli dell\'anno']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[4, 1, 14, 'Live Music 2024']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[4, 2, 18, '12 Concerti', 'Emozioni Pure']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[4, 3, 22, 'Rock al Forum', 'Jazz Festival', 'Indie sotto le stelle']
-		);
-
-		// Template 5: Letture Preferite (Theme: Libri)
-		await db.run(
-			`INSERT INTO templates (theme_id, name, description) 
-       VALUES (?, ?, ?)`,
-			[3, 'I Miei Libri 2024', 'Le letture che ti hanno appassionato']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[5, 1, 25, 'Un Anno di Letture']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[5, 2, 29, '24 libri letti', '8.500 pagine']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[5, 3, 33, 'Romanzi', 'Saggi', 'Poesia']
-		);
-
-		// Template 6: Book Club (Theme: Libri)
-		await db.run(
-			`INSERT INTO templates (theme_id, name, description) 
-       VALUES (?, ?, ?)`,
-			[3, 'Scoperte Letterarie', 'Nuovi autori e generi scoperti']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[6, 1, 26, 'Nuove Scoperte']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[6, 2, 30, '5 nuovi autori', '3 generi diversi']
-		);
-		await db.run(
-			`INSERT INTO template_pages (template_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[6, 3, 34, 'Fantasy', 'Thriller', 'Classici']
-		);
-
-		console.log(`   ✓ Created 6 templates (2 per theme)`);
-		console.log(`   ✓ Created 18 template pages (3 pages per template)`);
-
-		// ========================================
-		// SEED RECAPS
-		// ========================================
-		console.log('\n📝 Seeding recaps...');
-
-		// Alice's Recaps (3 total: 2 public, 1 private)
-		// Recap 1: Alice - Public - from template
-		await db.run(
-			`INSERT INTO recaps (user_id, theme_id, title, visibility) 
-       VALUES (?, ?, ?, ?)`,
-			[1, 1, 'Estate in Italia', 'public']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[1, 1, 1, 'La mia Estate Italiana']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[1, 2, 5, 'Da Nord a Sud', '20 Città Visitate']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[1, 3, 9, 'Pizza napoletana', 'Gelato artigianale', 'Pasta al pesto']
-		);
-
-		// Recap 2: Alice - Public - from template
-		await db.run(
-			`INSERT INTO recaps (user_id, theme_id, title, visibility) 
-       VALUES (?, ?, ?, ?)`,
-			[1, 2, 'Rock Year 2024', 'public']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[2, 1, 13, 'Il mio Anno Rock']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[2, 2, 17, '2.000 ore di rock', '500 band diverse']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[2, 3, 21, 'Classic Rock', 'Alternative', 'Hard Rock']
-		);
-
-		// Recap 3: Alice - Private
-		await db.run(
-			`INSERT INTO recaps (user_id, theme_id, title, visibility) 
-       VALUES (?, ?, ?, ?)`,
-			[1, 3, 'Letture Personali', 'private']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[3, 1, 25, 'I miei momenti di lettura']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[3, 2, 29, '15 romanzi', '3.200 pagine']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[3, 3, 33, 'Gialli', 'Storici', 'Contemporanei']
-		);
-
-		// Bob's Recaps (3 total: 1 public, 1 private, 1 derived from Alice)
-		// Recap 4: Bob - Public
-		await db.run(
-			`INSERT INTO recaps (user_id, theme_id, title, visibility) 
-       VALUES (?, ?, ?, ?)`,
-			[2, 2, 'Concerti Indimenticabili', 'public']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[4, 1, 14, 'Live 2024']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[4, 2, 18, '8 Concerti Live', 'Pura Magia']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[4, 3, 22, 'Coldplay a Milano', 'Ed Sheeran a Roma', 'Vasco a Bari']
-		);
-
-		// Recap 5: Bob - Derived from Alice's "Estate in Italia" (Recap 1)
-		await db.run(
-			`INSERT INTO recaps (user_id, theme_id, title, visibility, derived_from_recap_id, derived_from_author, derived_from_title) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-			[2, 1, 'Il mio Tour del Sud', 'public', 1, 'Alice Rossi', 'Estate in Italia']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[5, 1, 2, 'Alla scoperta del Sud']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[5, 2, 6, 'Puglia e Calabria', 'Mare cristallino']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[5, 3, 11, 'Orecchiette', 'Taralli', 'Focaccia barese']
-		);
-
-		// Recap 6: Bob - Private
-		await db.run(
-			`INSERT INTO recaps (user_id, theme_id, title, visibility) 
-       VALUES (?, ?, ?, ?)`,
-			[2, 3, 'Letture Estive', 'private']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[6, 1, 27, 'Estate di letture']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[6, 2, 31, '10 libri sotto l\'ombrellone', '2.800 pagine']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[6, 3, 35, 'Thriller', 'Fantasy', 'Avventura']
-		);
-
-		// Charlie's Recaps (3 total: 2 public, 1 private, 1 derived from Bob)
-		// Recap 7: Charlie - Public
-		await db.run(
-			`INSERT INTO recaps (user_id, theme_id, title, visibility) 
-       VALUES (?, ?, ?, ?)`,
-			[3, 3, 'Anno di Scoperte Letterarie', 'public']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[7, 1, 26, 'Scoprire Nuovi Mondi']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[7, 2, 30, '30 libri', '10.000 pagine']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[7, 3, 34, 'Sci-fi', 'Distopie', 'Biografie']
-		);
-
-		// Recap 8: Charlie - Derived from Bob's "Concerti Indimenticabili" (Recap 4)
-		await db.run(
-			`INSERT INTO recaps (user_id, theme_id, title, visibility, derived_from_recap_id, derived_from_author, derived_from_title) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-			[3, 2, 'Festival Musicali 2024', 'public', 4, 'Bob Verdi', 'Concerti Indimenticabili']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[8, 1, 15, 'Summer Festivals']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[8, 2, 19, '5 Festival', 'Musica e Natura']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[8, 3, 23, 'Indie Rock', 'Elettronica', 'World Music']
-		);
-
-		// Recap 9: Charlie - Private
-		await db.run(
-			`INSERT INTO recaps (user_id, theme_id, title, visibility) 
-       VALUES (?, ?, ?, ?)`,
-			[3, 1, 'Weekend Fuori Porta', 'private']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1) 
-       VALUES (?, ?, ?, ?)`,
-			[9, 1, 3, 'Piccole Fughe']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2) 
-       VALUES (?, ?, ?, ?, ?)`,
-			[9, 2, 8, '12 weekend', '8 regioni']
-		);
-		await db.run(
-			`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-			[9, 3, 12, 'Montagna', 'Lago', 'Borghi storici']
-		);
-
-		console.log(`   ✓ Created 9 recaps (3 per user)`);
-		console.log(`   ✓ Created 27 recap pages (3 pages per recap)`);
-		console.log(`   ✓ 2 recaps are derived from other users' recaps`);
-
-		console.log('\n🎉 Seeding completed successfully!\n');
-		console.log('📊 Database Summary:');
-		console.log('   • 3 users created');
-		console.log('   • 3 themes created');
-		console.log('   • 36 background images created (12 per theme)');
-		console.log('   • 6 templates created (2 per theme)');
-		console.log('   • 18 template pages created');
-		console.log('   • 9 recaps created (3 per user)');
-		console.log('   • 27 recap pages created');
-		console.log('   • Mix of public/private visibility');
-		console.log('   • 2 derived recaps included\n');
-
-		console.log('👤 Test Users:');
-		console.log('   username: alice   | password: Alice2025!');
-		console.log('   username: bob     | password: Bob@2025');
-		console.log('   username: charlie | password: Charlie#2025\n');
-
-	} catch (error) {
-		console.error('❌ Error during seeding:', error.message);
-		throw error;
+	} catch (err) {
+		console.error('❌ FATAL ERROR:', err);
 	} finally {
 		await db.close();
-		console.log('🔒 Database connection closed');
+		console.log('🔒 Database closed.');
 	}
 }
 
-// Execute the script
-seedDatabase().catch((error) => {
-	console.error('Fatal error:', error);
-	process.exit(1);
-});
+seedDatabase().catch(console.error);
