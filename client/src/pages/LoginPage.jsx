@@ -1,92 +1,83 @@
-import { useState } from "react";
+import { useState, useActionState } from "react";
+import "./LoginPage.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Container, Card, Form, Button, Alert } from "react-bootstrap";
+import { Container, Card, Form, Button } from "react-bootstrap";
 import { Eye, EyeSlash } from "react-bootstrap-icons";
 import CustomAlert from "../components/utils/Alert";
 
 function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const loginAction = async (prevState, formData) => {
+    const username = formData.get("username");
+    const password = formData.get("password");
+
     if (!username || !password) {
-      setError("Inserisci username e password");
-      return;
+      // Ritorna l'errore E lo username inserito
+      return { error: "Inserisci username e password", prevUsername: username };
     }
 
-    setLoading(true);
     try {
       const res = await login(username, password);
-      if (res.success) navigate("/");
-      else setError("Credenziali errate");
-    } catch {
-      setError("Errore server");
-    } finally {
-      setLoading(false);
+      if (res.success) {
+        navigate("/");
+        return { error: null };
+      } else {
+        // Ritorna l'errore E lo username inserito
+        return { error: "Credenziali errate", prevUsername: username };
+      }
+    } catch (err) {
+      return { error: "Errore server, " + err.message, prevUsername: username };
     }
   };
 
+  const [state, formAction, isPending] = useActionState(loginAction, { error: null });
+
   return (
-    <Container className="d-flex align-items-center justify-content-center mt-5">
-      <Card className="login-card w-100 border-0 py-4 px-4" style={{ maxWidth: "450px" }}>
-        <Card.Body className="p-0">
-          {/* Header Card */}
-          <div className="text-center mb-4">
-            <h2 className="fw-bold text-primary-custom">RecapApp</h2>
+    <Container className="login-container">
+      <Card className="login-card">
+        <Card.Body className="login-card-body">
+          <div className="login-header">
+            <h2 className="login-title">RecapApp</h2>
           </div>
 
-          {error && <CustomAlert message={error} type="error" />}
+          {state?.error && <CustomAlert message={state.error} type="error" />}
 
-          <Form onSubmit={handleSubmit}>
-            {/* GRUPPO USERNAME */}
-            <div className="mb-3">
+          <Form action={formAction} className="login-form">
+            <div className="login-group">
               <label className="form-label-custom">USERNAME</label>
               <Form.Control
+                name="username"
                 type="text"
                 placeholder="Inserisci il tuo username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={loading}
+                disabled={isPending}
+                defaultValue={state?.prevUsername || ""}
               />
             </div>
-
-            {/* GRUPPO PASSWORD */}
-            <div className="mb-3">
-              <div className="d-flex justify-content-between">
-                <label className="form-label-custom">PASSWORD</label>
-              </div>
-
+            <div className="login-group">
+              <label className="form-label-custom">PASSWORD</label>
               <div className="password-wrapper">
                 <Form.Control
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Inserisci la tua password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  style={{ paddingRight: "3rem" }}
+                  disabled={isPending}
+                  className="input-password"
                 />
                 <span className="password-icon" onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
                 </span>
               </div>
             </div>
-
-            {/* BOTTONE LOGIN */}
-            <Button type="submit" className="btn-primary-custom w-100 shadow-sm" disabled={loading}>
-              {loading ? "Accesso in corso..." : "ACCEDI"}
+            <Button type="submit" className="login-btn" disabled={isPending}>
+              {isPending ? "Accesso in corso..." : "Login"}
             </Button>
           </Form>
-
-          {/* Footer Card */}
-          <div className="mt-4 text-center">
+          <div className="login-footer">
             <small className="text-muted">
               Test users: alice, bob, charlie
               <br />

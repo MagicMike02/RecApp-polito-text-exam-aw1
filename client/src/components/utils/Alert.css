@@ -1,8 +1,10 @@
-.alert {
-  padding: 0.5rem 1.25rem;
+.alert-base {
+  align-items: center;
+  padding: 0.5rem 1rem;
   border: 1px solid transparent;
   border-radius: 0.25rem;
   font-size: 0.875rem;
+  box-sizing: border-box;
 }
 
 .alert-info {
