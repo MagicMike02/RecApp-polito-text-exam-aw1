@@ -39,7 +39,7 @@ function Navbar() {
             <div className="d-flex align-items-center gap-3">
               <span className="small fw-bold text-muted">{user?.name || user?.username || "Utente"}</span>
 
-              <button onClick={handleLogout} className="btn-outline-nav">
+              <button onClick={handleLogout} className="btn-logout">
                 Esci
               </button>
             </div>
@@ -47,7 +47,7 @@ function Navbar() {
             <Link
               to="/login"
               className="btn btn-primary-custom btn-sm d-flex align-items-center text-decoration-none"
-              style={{ minHeight: "40px", padding: "0 1.5rem" }} 
+              style={{ minHeight: "40px", padding: "0 1.5rem" }}
             >
               Login
             </Link>

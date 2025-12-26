@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Container, Card, Form, Button, Alert } from "react-bootstrap";
 import { Eye, EyeSlash } from "react-bootstrap-icons";
+import CustomAlert from "../components/utils/Alert";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -16,9 +17,11 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!username || !password) return;
+    if (!username || !password) {
+      setError("Inserisci username e password");
+      return;
+    }
 
-    setError("");
     setLoading(true);
     try {
       const res = await login(username, password);
@@ -36,22 +39,19 @@ function LoginPage() {
       <Card className="login-card w-100 border-0 py-4 px-4" style={{ maxWidth: "450px" }}>
         <Card.Body className="p-0">
           {/* Header Card */}
-          <div className="text-center mb-5">
-            <h2 className="fw-bold text-primary-custom mb-2">RecapApp</h2>
+          <div className="text-center mb-4">
+            <h2 className="fw-bold text-primary-custom">RecapApp</h2>
           </div>
-          {error && (
-            <Alert variant="danger" className="border-0 bg-danger-subtle text-danger small py-2 mb-4">
-              {error}
-            </Alert>
-          )}
+
+          {error && <CustomAlert message={error} type="error" />}
 
           <Form onSubmit={handleSubmit}>
             {/* GRUPPO USERNAME */}
-            <div className="mb-4">
+            <div className="mb-3">
               <label className="form-label-custom">USERNAME</label>
               <Form.Control
                 type="text"
-                placeholder="es. mario.rossi"
+                placeholder="Inserisci il tuo username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={loading}
@@ -59,7 +59,7 @@ function LoginPage() {
             </div>
 
             {/* GRUPPO PASSWORD */}
-            <div className="mb-5">
+            <div className="mb-3">
               <div className="d-flex justify-content-between">
                 <label className="form-label-custom">PASSWORD</label>
               </div>
@@ -67,7 +67,7 @@ function LoginPage() {
               <div className="password-wrapper">
                 <Form.Control
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="Inserisci la tua password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}

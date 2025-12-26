@@ -10,6 +10,21 @@
 
   --input-height: 52px;
   --navbar-height: 72px;
+
+  /* --- NEW COMMON VARIABLES --- */
+  --danger-color: #dc3545;
+  --danger-hover: #c82333;
+  --danger-active: #bd2130;
+
+  --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.25);
+
+  --border-radius-small: 8px;
+  --border-radius-medium: 10px;
+  --border-radius-large: 16px;
+
+  --transition-fast: all 0.2s;
+  --transition-medium: all 0.3s;
 }
 
 /* RESET */
@@ -21,7 +36,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* --- NAVBAR STYLES  --- */
+/* --- NAVBAR STYLES --- */
 .navbar-custom {
   background-color: #ffffff;
   height: var(--navbar-height);
@@ -70,21 +85,78 @@ body {
   width: 100%;
 }
 
-/* --- BOTTONI NAVBAR --- */
+/* --- BUTTONS: GENERAL STYLES --- */
+.btn {
+  border-radius: 10px;
+  font-weight: 600;
+  min-height: var(--input-height);
+  padding: 0 2rem;
+  transition: all 0.2s;
+}
+
+/* --- PRIMARY BUTTON --- */
+.btn-primary-custom {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+.btn-primary-custom:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+}
+.btn-primary-custom:active,
+.btn-primary-custom:focus {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: white !important;
+  box-shadow: none !important;
+}
+.btn-primary-custom[disabled] {
+  opacity: 0.7;
+}
+
+/* --- OUTLINE BUTTON --- */
 .btn-outline-nav {
   color: var(--text-muted);
   border: 1px solid #cbd5e1;
   background: transparent;
-  border-radius: 8px;
-  padding: 0.4rem 1.2rem;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.2s;
 }
 .btn-outline-nav:hover {
   border-color: #dc3545;
   color: #dc3545;
   background: #fff;
+}
+.btn-outline-nav:active,
+.btn-outline-nav:focus {
+  background-color: #fff !important;
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1) !important;
+}
+
+/* ---  --- */
+.btn-logout {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.75rem;
+  transition: all 0.2s;
+}
+.btn-logout:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+}
+.btn-logout:active,
+.btn-logout:focus {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: white !important;
+  box-shadow: none !important;
 }
 
 /* --- FORM CONTROLS --- */
@@ -103,22 +175,11 @@ body {
   box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.15);
 }
 
-/* --- BOTTONI GENERALI --- */
-.btn-primary-custom {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-weight: 600;
-  min-height: var(--input-height);
-  padding: 0 2rem;
-  transition: all 0.2s;
-}
-.btn-primary-custom:hover {
-  background-color: var(--primary-hover);
-  transform: translateY(-1px);
-  color: white;
-  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+/* --- FIX FOR LOADING STATE BUTTON --- */
+.btn-primary-custom[disabled] {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  opacity: 0.7;
 }
 
 /* --- UTILS --- */
