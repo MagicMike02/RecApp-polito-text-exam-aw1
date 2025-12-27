@@ -47,6 +47,7 @@ function RecapViewPage() {
         <div className="recap-meta">
           <span className="recap-author">di {recap.author_name}</span>
           <span className="recap-theme">{recap.theme_name}</span>
+          <span className="recap-card-badge">{recap.visibility === "public" ? "Pubblico" : "Privato"}</span>
           {recap.derived_from_recap_id && <span className="recap-derived">Derivato</span>}
         </div>
       </div>

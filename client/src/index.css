@@ -11,7 +11,12 @@
   --input-height: 52px;
   --navbar-height: 72px;
 
-  /* --- NEW COMMON VARIABLES --- */
+  /* --- CUSTOM BADGE & CARD COLORS --- */
+  --badge-bg: #e9e6fa;
+  --badge-color: #5a3ec8;
+  --card-bg: #fff;
+  --card-border: #e2e8f0;
+
   --danger-color: #dc3545;
   --danger-hover: #c82333;
   --danger-active: #bd2130;

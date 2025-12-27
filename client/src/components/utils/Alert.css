@@ -19,14 +19,23 @@
   border-color: #badbcc;
 }
 
+.alert-info {
+  background-color: var(--accent-light);
+  color: var(--primary-color);
+  border-color: #bee5eb;
+}
+.alert-success {
+  background-color: #d4edda;
+  color: #0f5132;
+  border-color: #badbcc;
+}
 .alert-warning {
   background-color: #fff3cd;
   color: #664d03;
   border-color: #ffecb5;
 }
-
 .alert-error {
   background-color: #f8d7da;
-  color: #dc3545;
+  color: var(--danger-color);
   border-color: #f5c2c7;
 }

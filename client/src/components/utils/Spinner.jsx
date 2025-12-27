@@ -1,5 +1,4 @@
 // Spinner.jsx
-import React from 'react';
 import './Spinner.css';
 
 function Spinner() {

@@ -31,7 +31,7 @@ function HomePage() {
 
   return (
     <div>
-      <h1 style={{ color: "var(--primary-color)", marginBlock: "1.5rem", paddingLeft: "2rem" }}>Lasciati ispirare dagli altri!</h1>
+      <h2 style={{ color: "var(--primary-color)", marginBlock: "1.5rem", paddingLeft: "2rem" }}>Lasciati ispirare dagli altri!</h2>
       <RecapList recaps={recaps} loading={loading} error={error} />
     </div>
   );

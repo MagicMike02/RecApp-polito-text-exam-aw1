@@ -1,12 +1,22 @@
+.recap-card-badge {
+  background: var(--badge-bg, #e9e6fa);
+  color: var(--badge-color, #5a3ec8);
+  border-radius: 8px;
+  padding: 0.1rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: 0.2em;
+  display: inline-block;
+}
 .recap-card {
-  background: #fff;
+  background: var(--card-bg, #fff);
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(15, 118, 110, 0.08);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.2s, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--card-border, #e2e8f0);
 }
 .recap-card:hover {
   box-shadow: 0 8px 32px rgba(15, 118, 110, 0.18);
@@ -46,6 +56,7 @@
   padding: 0.1rem 0.7rem;
   font-size: 0.85rem;
   font-weight: 600;
+  display: inline-block;
 }
 .recap-card-derived {
   display: inline-block;
