@@ -47,6 +47,7 @@
 .recap-card-badge-visibility {
   background: var(--badge-bg-visibility, #e9e6fa);
   color: var(--badge-color-visibility, #5a3ec8);
+  
   border-radius: 8px;
   padding: 0.1rem 0.7rem;
   font-size: 0.85rem;
@@ -66,6 +67,7 @@
 }
 .recap-card-badge-derived {
   color: var(--badge-derived-color, #a48256);
+  background: none;
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -74,6 +76,7 @@
   margin-right: 0;
   block-size: auto;
   align-self: flex-end;
+  padding: 0.1rem 0.7rem;
 }
 .recap-card-button {
   margin-top: auto;
