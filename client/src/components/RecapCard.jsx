@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import "./RecapCard.css";
 
 function RecapCard({ recap }) {
-  const coverUrl = recap.pages?.[0]?.background_image_url || recap.pages?.[0]?.background_url || "";
+  const coverUrl =
+    (recap.pages && recap.pages[0] && (recap.pages[0].background_image_url || recap.pages[0].background_url)) || "";
   const isPublic = recap.visibility === "public";
   const theme = recap.theme_name || "-";
   const author = recap.author_name || "Tu";
-  const isDerived = recap.derived_from_recap_id || recap.original_summary_id;
-  const derivedLabel = isDerived ? "Derivato da un altro recap" : null;
+  const isDerived = Boolean(recap.derived_from_recap_id || recap.original_summary_id);
+  const mainAuthor = recap.derived_from_author || "?";
 
   return (
     <div className="recap-card">
@@ -16,11 +17,16 @@ function RecapCard({ recap }) {
       <div className="recap-card-body">
         <h3 className="recap-card-title">{recap.title}</h3>
         <div className="recap-card-meta">
-          <span className="recap-card-author">di {author}</span>
-          <span className="recap-card-theme">{theme}</span>
-          <span className="recap-card-badge">{isPublic ? "Pubblico" : "Privato"}</span>
+          <span className="recap-card-badge-author">di {author}</span>
+          <span className="recap-card-badge-theme">{theme}</span>
+          <span className="recap-card-badge-visibility">{isPublic ? "Pubblico" : "Privato"}</span>
         </div>
-        {derivedLabel && <span className="recap-card-derived">{derivedLabel}</span>}
+        <div className="recap-card-meta">
+          <span className="recap-card-badge-derived" style={{ visibility: isDerived ? "visible" : "hidden" }}>
+            Da <i>{mainAuthor}</i>
+          </span>
+        </div>
+
         <Link to={`/recaps/${recap.id}`} className="recap-card-button">
           Visualizza
         </Link>

@@ -1,5 +1,6 @@
 import { openDatabase } from '../database/db.js';
 
+
 export async function getPublicRecaps() {
 	const db = await openDatabase();
 	try {
@@ -9,8 +10,7 @@ export async function getPublicRecaps() {
                 u.username as author_username, 
                 u.name as author_name,
                 th.name as theme_name,
-                
-				--Uso funzioni Json che crea un array JSON delle pagine direttamente in SQL
+                -- Crea un array JSON delle pagine direttamente in SQL
                 json_group_array(
                     json_object(
                         'id', rp.id,
@@ -27,6 +27,7 @@ export async function getPublicRecaps() {
             FROM recaps r
             JOIN users u ON r.user_id = u.id
             JOIN themes th ON r.theme_id = th.id
+            -- LEFT JOIN perché un recap potrebbe (teoricamente) non avere ancora pagine salvate
             LEFT JOIN recap_pages rp ON r.id = rp.recap_id
             LEFT JOIN background_images bi ON rp.background_image_id = bi.id
             WHERE r.visibility = 'public'
@@ -37,7 +38,6 @@ export async function getPublicRecaps() {
 		// Parsiamo la stringa JSON restituita da SQLite
 		return recaps.map(recap => ({
 			...recap,
-			// Filtra elementi nulli se LEFT JOIN non trova match
 			pages: JSON.parse(recap.pages).filter(p => p.id !== null)
 				.sort((a, b) => a.page_number - b.page_number)
 		}));
@@ -46,6 +46,7 @@ export async function getPublicRecaps() {
 		await db.close();
 	}
 }
+
 export async function getRecapsByUser(userId) {
 	const db = await openDatabase();
 	try {
@@ -53,11 +54,12 @@ export async function getRecapsByUser(userId) {
             SELECT 
                 r.*, 
                 th.name as theme_name,
+                
                 json_group_array(
                     json_object(
                         'id', rp.id,
                         'page_number', rp.page_number,
-                        'background_image_url', bi.url, -- Alias pronto per il frontend
+                        'background_image_url', bi.url,
                         'text_fields_count', bi.text_fields_count
                     )
                 ) as pages
@@ -70,6 +72,7 @@ export async function getRecapsByUser(userId) {
             ORDER BY r.created_at DESC
         `, [userId]);
 
+		// Parsiamo il JSON delle pagine
 		return recaps.map(recap => {
 			const parsedPages = JSON.parse(recap.pages)
 				.filter(p => p.id !== null)
@@ -95,7 +98,6 @@ export async function getRecapById(id, userId = null) {
                 u.username as author_username, 
                 u.name as author_name,
                 th.name as theme_name,
-                /* Costruiamo l'array delle pagine direttamente in SQL */
                 json_group_array(
                     json_object(
                         'id', rp.id,
@@ -104,9 +106,9 @@ export async function getRecapById(id, userId = null) {
                         'text_field_1', rp.text_field_1,
                         'text_field_2', rp.text_field_2,
                         'text_field_3', rp.text_field_3,
-                        'background_image_url', bi.url, -- Alias fatto direttamente qui
+                        'background_image_url', bi.url, 
                         'text_fields_count', bi.text_fields_count,
-                        'text_positions', json(bi.text_positions) -- 'json()' evita il doppio escape delle stringhe
+                        'text_positions', json(bi.text_positions) 
                     )
                 ) as pages
             FROM recaps r
@@ -120,10 +122,14 @@ export async function getRecapById(id, userId = null) {
 
 		if (!recap) return null;
 
+		// Controllo Permessi: Se è privato e non sei l'autore, via.
 		if (recap.visibility === 'private' && recap.user_id !== userId) {
 			return null;
 		}
 
+		// SQLite restituisce 'pages' come stringa JSON, dobbiamo parsarlo.
+		// .filter(p => p.id) serve nel caso estremo in cui un recap non abbia pagine (LEFT JOIN ritorna [null])
+		// .sort assicura che l'ordine sia corretto (anche se SQL di solito lo rispetta)
 		const parsedPages = JSON.parse(recap.pages)
 			.filter(p => p.id !== null)
 			.sort((a, b) => a.page_number - b.page_number);
