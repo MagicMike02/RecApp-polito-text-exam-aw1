@@ -49,18 +49,38 @@ export async function getPublicRecaps() {
 export async function getRecapsByUser(userId) {
 	const db = await openDatabase();
 	try {
-		const recaps = await db.all(
-			`SELECT r.id, r.title, r.user_id, r.theme_id, r.visibility,
-              r.derived_from_recap_id, r.derived_from_author, r.derived_from_title,
-              r.created_at, r.updated_at,
-              th.name as theme_name
-       FROM recaps r
-       JOIN themes th ON r.theme_id = th.id
-       WHERE r.user_id = ?
-       ORDER BY r.created_at DESC`,
-			[userId]
-		);
-		return recaps;
+		const recaps = await db.all(`
+            SELECT 
+                r.*, 
+                th.name as theme_name,
+                json_group_array(
+                    json_object(
+                        'id', rp.id,
+                        'page_number', rp.page_number,
+                        'background_image_url', bi.url, -- Alias pronto per il frontend
+                        'text_fields_count', bi.text_fields_count
+                    )
+                ) as pages
+            FROM recaps r
+            JOIN themes th ON r.theme_id = th.id
+            LEFT JOIN recap_pages rp ON r.id = rp.recap_id
+            LEFT JOIN background_images bi ON rp.background_image_id = bi.id
+            WHERE r.user_id = ?
+            GROUP BY r.id
+            ORDER BY r.created_at DESC
+        `, [userId]);
+
+		return recaps.map(recap => {
+			const parsedPages = JSON.parse(recap.pages)
+				.filter(p => p.id !== null)
+				.sort((a, b) => a.page_number - b.page_number);
+
+			return {
+				...recap,
+				pages: parsedPages,
+			};
+		});
+
 	} finally {
 		await db.close();
 	}
@@ -69,48 +89,50 @@ export async function getRecapsByUser(userId) {
 export async function getRecapById(id, userId = null) {
 	const db = await openDatabase();
 	try {
-		// Get recap info
-		const recap = await db.get(
-			`SELECT r.id, r.title, r.user_id, r.theme_id, r.visibility,
-              r.derived_from_recap_id, r.derived_from_author, r.derived_from_title,
-              r.created_at, r.updated_at,
-              u.username as author_username, u.name as author_name,
-              th.name as theme_name
-       FROM recaps r
-       JOIN users u ON r.user_id = u.id
-       JOIN themes th ON r.theme_id = th.id
-       WHERE r.id = ?`,
-			[id]
-		);
+		const recap = await db.get(`
+            SELECT 
+                r.*,
+                u.username as author_username, 
+                u.name as author_name,
+                th.name as theme_name,
+                /* Costruiamo l'array delle pagine direttamente in SQL */
+                json_group_array(
+                    json_object(
+                        'id', rp.id,
+                        'page_number', rp.page_number,
+                        'background_image_id', rp.background_image_id,
+                        'text_field_1', rp.text_field_1,
+                        'text_field_2', rp.text_field_2,
+                        'text_field_3', rp.text_field_3,
+                        'background_image_url', bi.url, -- Alias fatto direttamente qui
+                        'text_fields_count', bi.text_fields_count,
+                        'text_positions', json(bi.text_positions) -- 'json()' evita il doppio escape delle stringhe
+                    )
+                ) as pages
+            FROM recaps r
+            JOIN users u ON r.user_id = u.id
+            JOIN themes th ON r.theme_id = th.id
+            LEFT JOIN recap_pages rp ON r.id = rp.recap_id
+            LEFT JOIN background_images bi ON rp.background_image_id = bi.id
+            WHERE r.id = ?
+            GROUP BY r.id
+        `, [id]);
 
 		if (!recap) return null;
 
-		// Check visibility permissions
 		if (recap.visibility === 'private' && recap.user_id !== userId) {
-			return null; // User not authorized to view this private recap
+			return null;
 		}
 
-		// Get recap pages
-		const pages = await db.all(
-			`SELECT rp.id, rp.page_number, rp.background_image_id,
-              rp.text_field_1, rp.text_field_2, rp.text_field_3,
-              bi.url as image_url, bi.text_fields_count, bi.text_positions
-       FROM recap_pages rp
-       JOIN background_images bi ON rp.background_image_id = bi.id
-       WHERE rp.recap_id = ?
-       ORDER BY rp.page_number`,
-			[id]
-		);
+		const parsedPages = JSON.parse(recap.pages)
+			.filter(p => p.id !== null)
+			.sort((a, b) => a.page_number - b.page_number);
 
+		return {
+			...recap,
+			pages: parsedPages
+		};
 
-		// Map image_url to background_image_url for frontend compatibility
-		recap.pages = pages.map(page => ({
-			...page,
-			background_image_url: page.image_url, // alias for frontend
-			text_positions: JSON.parse(page.text_positions)
-		}));
-
-		return recap;
 	} finally {
 		await db.close();
 	}

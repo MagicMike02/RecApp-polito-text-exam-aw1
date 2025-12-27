@@ -17,7 +17,7 @@ function Navbar() {
         {/* LATO SINISTRO: Logo + Menu */}
         <div className="d-flex align-items-center gap-5">
           <Link to="/" className="brand-text">
-            RecapApp
+            RecApp
           </Link>
 
           <div className="d-flex">

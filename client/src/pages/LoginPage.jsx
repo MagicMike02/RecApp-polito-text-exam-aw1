@@ -56,6 +56,7 @@ function LoginPage() {
                 placeholder="Inserisci il tuo username"
                 disabled={isPending}
                 defaultValue={state?.prevUsername || ""}
+                autoComplete="username"
               />
             </div>
             <div className="login-group">
