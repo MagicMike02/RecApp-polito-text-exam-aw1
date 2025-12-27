@@ -1,3 +1,13 @@
+.recap-card-badge {
+  background: var(--badge-bg, #e9e6fa);
+  color: var(--badge-color, #5a3ec8);
+  border-radius: 8px;
+  padding: 0.1rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: 0.2em;
+  display: inline-block;
+}
 .recap-card {
   background: var(--card-bg, #fff);
   border-radius: 16px;
@@ -7,8 +17,6 @@
   flex-direction: column;
   transition: box-shadow 0.2s, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   border: 1px solid var(--card-border, #e2e8f0);
-  max-width: 520px;
-  width: 100%;
 }
 .recap-card:hover {
   box-shadow: 0 8px 32px rgba(15, 118, 110, 0.18);
@@ -21,11 +29,10 @@
   width: 100%;
 }
 .recap-card-body {
-  padding: 1.2rem 1.3rem 1.3rem 1.3rem;
+  padding: 1.2rem 1.5rem 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  flex: 1 1 auto;
 }
 .recap-card-title {
   color: var(--primary-color);
@@ -35,27 +42,14 @@
 }
 .recap-card-meta {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
+  font-size: 0.95rem;
   color: var(--text-muted);
 }
-
-.recap-card-badge-author {
-  font-size: 0.9rem;
+.recap-card-author {
   font-weight: 500;
 }
-
-.recap-card-badge-visibility {
-  background: var(--badge-bg-visibility, #e9e6fa);
-  color: var(--badge-color-visibility, #5a3ec8);
-  border-radius: 8px;
-  padding: 0.1rem 0.7rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-left: 0.2em;
-  display: inline-block;
-}
-
-.recap-card-badge-theme {
+.recap-card-theme {
   background: var(--accent-light);
   color: var(--primary-color);
   border-radius: 8px;
@@ -64,19 +58,18 @@
   font-weight: 600;
   display: inline-block;
 }
-.recap-card-badge-derived {
-  color: var(--badge-derived-color, #a48256);
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
+.recap-card-derived {
   display: inline-block;
-  margin-left: auto;
-  margin-right: 0;
-  block-size: auto;
-  align-self: flex-end;
+  background: var(--danger-color);
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.1rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
 }
 .recap-card-button {
-  margin-top: auto;
+  margin-top: 0.7rem;
   background: var(--primary-color);
   color: #fff;
   border: none;

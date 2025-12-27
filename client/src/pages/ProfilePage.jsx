@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import RecapList from "../components/RecapList";
 import { getUserRecaps } from "../services/apiService";
 
@@ -9,10 +9,10 @@ function ProfilePage() {
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     getUserRecaps()
       .then((data) => {
         console.log("Recap personali ricevuti:", data);
-        setError("");
         setRecaps(data);
         setLoading(false);
       })

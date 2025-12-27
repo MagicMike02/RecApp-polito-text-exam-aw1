@@ -1,16 +1,13 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import "./RecapViewPage.css";
 import { useParams, useNavigate } from "react-router-dom";
 import { getRecapById } from "../services/apiService";
-import { AuthContext } from "../context/AuthContext";
 import Spinner from "../components/utils/Spinner";
 import Alert from "../components/utils/Alert";
 
 function RecapViewPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { user } = useContext(AuthContext);
-
   const [recap, setRecap] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -18,29 +15,18 @@ function RecapViewPage() {
 
   useEffect(() => {
     setLoading(true);
+    setError("");
     getRecapById(id)
       .then((data) => {
         setRecap(data);
         setLoading(false);
+        setCurrentPage(0);
       })
       .catch((err) => {
-        setError(err.message || "Errore nel caricamento.");
+        setError(err.message || "Errore nel caricamento del recap.");
         setLoading(false);
       });
   }, [id]);
-
-  const handleDerive = () => {
-    navigate("/create", {
-      state: {
-        derivedFrom: {
-          id: recap.id,
-          title: recap.title,
-          author: recap.author_name,
-          themeId: recap.theme_id,
-        },
-      },
-    });
-  };
 
   if (loading) return <Spinner />;
   if (error) return <Alert message={error} type="error" />;
@@ -48,63 +34,96 @@ function RecapViewPage() {
 
   const pages = recap.pages || [];
   const page = pages[currentPage] || {};
-  const isLastPage = currentPage === pages.length - 1;
-  const isFirstPage = currentPage === 0;
 
   return (
     <div className="recap-view-container">
       <div className="recap-header-row">
         <button className="back-btn" onClick={() => navigate(-1)}>
-          &larr; Indietro
+          &larr; Torna indietro
         </button>
         <h2 className="recap-title">{recap.title}</h2>
       </div>
-
       <div className="recap-info">
         <div className="recap-meta">
-          <span className="recap-badge badge-author">di {recap.author_name}</span>
-          <span className="recap-badge badge-theme">{recap.theme_name}</span>
-          <span className="recap-badge badge-visibility">{recap.visibility === "public" ? "Pubblico" : "Privato"}</span>
+          <span className="recap-author">di {recap.author_name}</span>
+          <span className="recap-theme">{recap.theme_name}</span>
+          <span className="recap-card-badge">{recap.visibility === "public" ? "Pubblico" : "Privato"}</span>
+          {recap.derived_from_recap_id && <span className="recap-derived">Derivato</span>}
         </div>
-        {recap.derived_from_recap_id && (
-          <div className="recap-meta derived-row">
-            <span className="recap-badge badge-derived">Ispirato da {recap.derived_from_author}</span>
-          </div>
-        )}
       </div>
-
       <div className="recap-slideshow">
-        <div className="recap-slideshow-img-wrapper">
-          <img src={page.background_image_url} alt={"Slide " + (currentPage + 1)} className="recap-slideshow-img" />
-
-          {page.text_positions &&
-            page.text_positions.fields &&
-            page.text_positions.fields.map((pos, index) => {
-              const textContent = page[`text_field_${index + 1}`];
-              if (!textContent) return null;
-
-              return (
+        <div className="recap-slideshow-img-wrapper" style={{ position: "relative" }}>
+          <img
+            src={page.background_image_url}
+            alt={"Pagina " + (currentPage + 1)}
+            className="recap-slideshow-img"
+            style={{ width: "100%", borderRadius: "16px", boxShadow: "0 4px 24px rgba(15,118,110,0.10)" }}
+          />
+          {/* Overlay testi secondo struttura fields aggiornata */}
+          {page.text_positions && page.text_positions.fields && (
+            <>
+              {page.text_field_1 && page.text_positions.fields[0] && (
                 <div
-                  key={index}
                   className="recap-slideshow-text"
                   style={{
-                    left: `${pos.x * 100}%`,
-                    top: `${pos.y * 100}%`,
-                    width: `${pos.w * 100}%`,
-                    height: `${pos.h * 100}%`,
+                    position: "absolute",
+                    left: `${page.text_positions.fields[0].x * 100}%`,
+                    top: `${page.text_positions.fields[0].y * 100}%`,
+                    width: `${page.text_positions.fields[0].w * 100}%`,
+                    height: `${page.text_positions.fields[0].h * 100}%`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 2,
                   }}
                 >
-                  {textContent}
+                  {page.text_field_1}
                 </div>
-              );
-            })}
+              )}
+              {page.text_field_2 && page.text_positions.fields[1] && (
+                <div
+                  className="recap-slideshow-text"
+                  style={{
+                    position: "absolute",
+                    left: `${page.text_positions.fields[1].x * 100}%`,
+                    top: `${page.text_positions.fields[1].y * 100}%`,
+                    width: `${page.text_positions.fields[1].w * 100}%`,
+                    height: `${page.text_positions.fields[1].h * 100}%`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 2,
+                  }}
+                >
+                  {page.text_field_2}
+                </div>
+              )}
+              {page.text_field_3 && page.text_positions.fields[2] && (
+                <div
+                  className="recap-slideshow-text"
+                  style={{
+                    position: "absolute",
+                    left: `${page.text_positions.fields[2].x * 100}%`,
+                    top: `${page.text_positions.fields[2].y * 100}%`,
+                    width: `${page.text_positions.fields[2].w * 100}%`,
+                    height: `${page.text_positions.fields[2].h * 100}%`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 2,
+                  }}
+                >
+                  {page.text_field_3}
+                </div>
+              )}
+            </>
+          )}
         </div>
-
         <div className="recap-slideshow-controls">
           <button
             className="recap-slideshow-btn"
             onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-            disabled={isFirstPage}
+            disabled={currentPage === 0}
           >
             Precedente
           </button>
@@ -114,20 +133,12 @@ function RecapViewPage() {
           <button
             className="recap-slideshow-btn"
             onClick={() => setCurrentPage((p) => Math.min(p + 1, pages.length - 1))}
-            disabled={isLastPage}
+            disabled={currentPage === pages.length - 1}
           >
             Successiva
           </button>
         </div>
       </div>
-
-      {user && user.id !== recap.user_id && (
-        <div className="recap-footer-actions">
-          <button className="derive-btn" onClick={handleDerive}>
-            Crea il tuo anno simile a questo
-          </button>
-        </div>
-      )}
     </div>
   );
 }
