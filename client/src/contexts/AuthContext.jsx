@@ -1,13 +1,12 @@
-import { createContext, useState, useEffect, useContext } from 'react';
-import * as API from '../services/apiService';
+import { createContext, useState, useEffect, useContext } from "react";
+import * as API from "../services/apiService";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if user is already logged in on mount
   useEffect(() => {
     checkAuth();
   }, []);
@@ -39,7 +38,7 @@ export function AuthProvider({ children }) {
     try {
       await API.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       setUser(null);
     }
@@ -59,7 +58,7 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
