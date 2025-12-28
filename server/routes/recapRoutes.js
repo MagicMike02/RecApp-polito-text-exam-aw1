@@ -28,14 +28,11 @@ router.get('/my', isAuthenticated, async (req, res) => {
 router.get('/:id', validateRecapId, async (req, res) => {
 	try {
 		const { id } = req.params;
-		const recap = await recapDao.getRecapById(parseInt(id));
+		const userId = req.user ? req.user.id : null;
+		const recap = await recapDao.getRecapById(parseInt(id), userId);
 
 		if (!recap) {
 			return res.status(404).json({ error: 'Recap not found' });
-		}
-
-		if (recap.visibility === 'private' && (!req.user || req.user.id !== recap.user_id)) {
-			return res.status(403).json({ error: 'Forbidden: You do not have permission to view this recap' });
 		}
 
 		res.json(recap);
