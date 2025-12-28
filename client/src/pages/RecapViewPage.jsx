@@ -67,7 +67,6 @@ function RecapViewPage() {
             className="recap-slideshow-img"
             style={{ width: "100%", borderRadius: "16px", boxShadow: "0 4px 24px rgba(15,118,110,0.10)" }}
           />
-          {/* Overlay testi secondo struttura fields aggiornata */}
           {page.text_positions && page.text_positions.fields && (
             <>
               {page.text_field_1 && page.text_positions.fields[0] && (
