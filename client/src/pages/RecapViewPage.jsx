@@ -44,11 +44,19 @@ function RecapViewPage() {
         <h2 className="recap-title">{recap.title}</h2>
       </div>
       <div className="recap-info">
-        <div className="recap-meta">
-          <span className="recap-author">di {recap.author_name}</span>
-          <span className="recap-theme">{recap.theme_name}</span>
-          <span className="recap-card-badge">{recap.visibility === "public" ? "Pubblico" : "Privato"}</span>
-          {recap.derived_from_recap_id && <span className="recap-derived">Derivato</span>}
+        <div className="recap-card-meta" style={{ justifyContent: "center" }}>
+          <span className="recap-card-badge-author">di {recap.author_name}</span>
+          <span className="recap-card-badge-theme">{recap.theme_name}</span>
+          <span className="recap-card-badge-visibility">{recap.visibility === "public" ? "Pubblico" : "Privato"}</span>
+        </div>
+
+        <div className="recap-card-meta">
+          <span
+            className="recap-card-badge-derived"
+            style={{ visibility: recap.derived_from_recap_id ? "visible" : "hidden" }}
+          >
+            Da <i>{recap.derived_from_author}</i>
+          </span>
         </div>
       </div>
       <div className="recap-slideshow">

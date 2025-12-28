@@ -10,9 +10,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: 90%;
-  overflow: hidden;
+  margin-bottom: 1rem;
+  min-height: 30px;
 }
+
 .recap-view-container {
   max-width: 1000px;
   margin: 1rem auto;
@@ -51,36 +52,68 @@
   transform: translateX(-3px);
 }
 
+.recap-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin: 0;
+  line-height: 1.2;
+}
+
 .recap-info {
   margin-bottom: 1rem;
   text-align: center;
+  margin-bottom: 1rem;
 }
 .recap-meta {
   display: flex;
   justify-content: center;
   gap: 1rem;
+  align-items: center;
+}
+
+.recap-card-badge-author {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  font-weight: 600;
+  padding: 4px 0;
+  display: inline-block;
 }
-.recap-author {
-  font-weight: 500;
-}
-.recap-theme {
-  background: var(--accent-light);
+
+.recap-card-badge-theme {
+  background-color: var(--accent-light, #dcfce7);
   color: var(--primary-color);
-  border-radius: 8px;
-  padding: 0.1rem 0.7rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.recap-card-badge-visibility {
+  background: var(--badge-bg-visibility, #e9e6fa);
+  color: var(--badge-color-visibility, #5a3ec8);
+  border: 1px solid var(--card-border, #e2e8f0);
+  padding: 4px 12px;
+  border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
+  margin-left: 0.2em;
+  display: inline-block;
 }
-.recap-derived {
-  background: var(--danger-color);
-  color: #fff;
+
+.recap-card-badge-derived {
+  color: var(--badge-derived-color, #a48256);
+  background: none;
   border-radius: 8px;
-  padding: 0.1rem 0.7rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
+  display: inline-block;
+  margin-left: auto;
+  margin-right: 0;
+  block-size: auto;
+  align-self: flex-end;
+  padding: 0.1rem 0.7rem;
 }
+
+/* --- FINE BADGES --- */
+
 .recap-slideshow {
   margin: 0 auto;
   max-width: 720px;
