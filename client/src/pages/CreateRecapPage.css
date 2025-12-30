@@ -92,8 +92,8 @@
 }
 .crp-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 1rem;
 }
 .crp-card {
   background: var(--card-bg);
@@ -103,8 +103,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  max-width: 22rem;
-  min-height: 14rem;
+  width: 100%;
+
   padding: 1.5rem 1.2rem 1.2rem 1.2rem;
   transition: box-shadow 0.2s, border 0.2s, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -210,20 +210,22 @@
 .crp-theme-btn.selected .crp-preview-img {
   box-shadow: 0 0 0 2px var(--primary-color);
 }
-@media (max-width: 600px) {
-  .crp-title {
-    font-size: 1rem;
+
+@media (max-width: 700px) {
+  .crp-create-recap-container {
+    padding: 1rem 0.5rem;
   }
-  .crp-btn {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.7rem;
-    min-width: 5.5rem;
-    max-width: 10rem;
+  .crp-list {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    padding: 0 0.2rem;
   }
-  .crp-badge,
-  .crp-pages,
-  .crp-author-badge {
-    font-size: 0.7rem;
-    max-width: 5rem;
+  .crp-card {
+    min-width: 0;
+    max-width: 100%;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.5rem;
+    border-radius: 1.2rem;
+    box-shadow: 0 6px 24px rgba(15, 118, 110, 0.13);
   }
 }
