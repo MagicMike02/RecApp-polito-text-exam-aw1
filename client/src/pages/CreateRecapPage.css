@@ -1,48 +1,49 @@
-/* --- CONTAINER & HEADER --- */
-.create-recap-container {
+.crp-create-recap-container {
+  max-width: 100rem;
   margin: 0 auto;
-  padding: 1.5rem 0.75rem 1.5rem 0.75rem;
+  padding: 2.5rem 1.5rem 2.5rem 1.5rem;
   background: var(--bg-app);
   min-height: 100vh;
 }
-.create-recap-header {
+.crp-center-text {
+  text-align: center;
+}
+.crp-create-recap-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2.5rem;
 }
-.create-recap-title {
-  font-size: 2.1rem;
+.crp-create-recap-title {
+  font-size: 2rem;
   font-weight: 800;
   color: var(--primary-color);
   margin: 0;
-  letter-spacing: -1px;
+  letter-spacing: -0.0625rem;
 }
-.create-recap-cancel {
+.crp-create-recap-cancel {
   background: none;
-  border: 1.5px solid var(--danger-color);
+  border: 1px solid var(--danger-color);
   color: var(--danger-color);
   border-radius: var(--border-radius-medium);
   font-weight: 700;
   font-size: 1rem;
   padding: 0.5rem 2.2rem;
-  transition: var(--transition-fast);
+  transition: background 0.2s, color 0.2s, border 0.2s;
   cursor: pointer;
 }
-.create-recap-cancel:hover {
+.crp-create-recap-cancel:hover {
   background: var(--danger-color);
   color: #fff;
   border-color: var(--danger-hover);
 }
-
-/* --- TABS (Bootstrap) --- */
-.create-recap-tabs .nav-link.active {
+.crp-create-recap-tabs .nav-link.active {
   color: var(--primary-color) !important;
   border-bottom: 2.5px solid var(--primary-color) !important;
   font-weight: 700;
   background: var(--accent-light) !important;
 }
-.create-recap-tabs .nav-link {
+.crp-create-recap-tabs .nav-link {
   color: var(--text-muted);
   font-weight: 600;
   font-size: 1.1rem;
@@ -50,198 +51,179 @@
   background: none;
   transition: color 0.2s;
 }
-.create-recap-tabs .nav-link:hover {
+.crp-create-recap-tabs .nav-link:hover {
   color: var(--primary-color);
 }
-
-/* --- THEME BUTTONS --- */
-.theme-btns {
+.crp-theme-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+}
+.crp-theme-btns {
   display: flex;
   gap: 0.7rem;
   flex-wrap: wrap;
   margin-bottom: 1.5rem;
 }
-.theme-btn {
-  background: var(--badge-bg);
+.crp-theme-btn {
   color: var(--badge-color);
-  border: 1.5px solid var(--badge-color);
+  border: 1px solid var(--badge-color);
   border-radius: var(--border-radius-medium);
   font-weight: 700;
   font-size: 1rem;
   padding: 0.5rem 1.7rem;
-  transition: var(--transition-fast);
+  transition: background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   outline: none;
+  box-shadow: 0 2px 8px rgba(15, 118, 110, 0.08);
 }
-.theme-btn.selected,
-.theme-btn:active {
+.crp-theme-btn.selected,
+.crp-theme-btn:active {
   background: var(--primary-color);
   color: #fff;
   border-color: var(--primary-color);
 }
-.theme-btn:hover {
+.crp-theme-btn:hover {
   background: var(--primary-hover);
   color: #fff;
   border-color: var(--primary-hover);
+  box-shadow: 0 8px 32px rgba(15, 118, 110, 0.18);
+  transform: translateY(-3px) scale(1.04);
 }
-
-/* --- TEMPLATE CARDS --- */
-.template-list {
+.crp-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
   gap: 2rem;
 }
-.template-card {
+.crp-card {
   background: var(--card-bg);
   border: 1.5px solid var(--card-border);
   border-radius: var(--border-radius-large);
-  box-shadow: var(--shadow-light);
-  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.08);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  min-height: 220px;
-  transition: box-shadow 0.2s, border 0.2s;
+  max-width: 22rem;
+  min-height: 14rem;
+  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+  transition: box-shadow 0.2s, border 0.2s, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.template-card:hover {
-  box-shadow: var(--shadow-medium);
+.crp-card:hover {
+  box-shadow: 0 8px 32px rgba(15, 118, 110, 0.18);
   border-color: var(--primary-color);
+  transform: translateY(-6px) scale(1.03);
 }
-.template-title {
+.crp-title {
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--primary-color);
   margin-bottom: 0.3rem;
 }
-.template-desc {
+.crp-desc {
   color: var(--text-muted);
   font-size: 0.98rem;
   margin-bottom: 0.7rem;
 }
-.template-badges {
+.crp-badges {
   display: flex;
+  width: 100%;
   gap: 0.7rem;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 100%;
+  justify-content: flex-start;
 }
-.template-badge {
+.crp-badge,
+.crp-pages,
+.crp-author-badge {
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.2rem 0.8rem;
+  overflow: hidden;
+  max-width: 100%;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.crp-badge {
   background: var(--badge-bg);
   color: var(--badge-color);
-  font-weight: 600;
-  border-radius: 8px;
-  padding: 0.2rem 0.8rem;
-  font-size: 0.95rem;
 }
-.template-pages {
+.crp-pages {
   background: var(--accent-light);
   color: var(--primary-color);
-  font-weight: 600;
-  border-radius: 8px;
-  padding: 0.2rem 0.8rem;
-  font-size: 0.95rem;
 }
-.template-btn {
-  margin-top: auto;
-  background: var(--primary-color);
-  color: #fff;
-  border: none;
-  border-radius: var(--border-radius-medium);
-  font-weight: 700;
-  font-size: 1rem;
-  padding: 0.5rem 1.7rem;
-  transition: var(--transition-fast);
-  cursor: pointer;
-  width: 100%;
-}
-.template-btn:hover {
-  background: var(--primary-hover);
-}
-
-/* --- RECAP CARDS --- */
-.recap-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 2rem;
-}
-.recap-card {
-  background: var(--card-bg);
-  border: 1.5px solid var(--card-border);
-  border-radius: var(--border-radius-large);
-  box-shadow: var(--shadow-light);
-  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  min-height: 180px;
-  transition: box-shadow 0.2s, border 0.2s;
-}
-.recap-card:hover {
-  box-shadow: var(--shadow-medium);
-  border-color: var(--primary-color);
-}
-.recap-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  margin-bottom: 0.3rem;
-}
-.recap-meta {
+.crp-author-badge {
+  background: none;
   color: var(--text-muted);
-  font-size: 0.97rem;
-  margin-bottom: 1.1rem;
-}
-.recap-btns {
-  display: flex;
-  gap: 0.7rem;
+  padding: 0;
+  display: block;
   width: 100%;
+  text-align: right;
 }
-.recap-btn {
+.crp-btn {
   background: var(--primary-color);
   color: #fff;
   border: none;
   border-radius: var(--border-radius-medium);
-  font-weight: 700;
-  font-size: 1rem;
-  padding: 0.45rem 1.2rem;
-  transition: var(--transition-fast);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.7rem;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
+  min-width: 3rem;
+  max-width: 12rem;
+  white-space: nowrap;
+  overflow: hidden;
   flex: 1 1 0;
+  box-shadow: 0 2px 8px rgba(15, 118, 110, 0.08);
 }
-.recap-btn:hover {
+.crp-btn:hover {
   background: var(--primary-hover);
+  box-shadow: 0 8px 32px rgba(15, 118, 110, 0.18);
+  transform: translateY(-3px) scale(1.04);
 }
-
-/* --- SECTION --- */
-.create-recap-section {
+.crp-btn-row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+  margin-top: auto;
+}
+.crp-create-recap-section {
   margin-top: 1.5rem;
   margin-bottom: 2.5rem;
 }
-
-/* --- RESPONSIVE --- */
-@media (max-width: 900px) {
-  .create-recap-container {
-    padding: 1.2rem 0.5rem;
-  }
-  .create-recap-header {
-    flex-direction: column;
-    gap: 1.2rem;
-    align-items: flex-start;
-  }
+.crp-preview-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.4rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s;
+}
+.crp-theme-btn.selected .crp-preview-img {
+  box-shadow: 0 0 0 2px var(--primary-color);
 }
 @media (max-width: 600px) {
-  .create-recap-title {
-    font-size: 1.3rem;
-  }
-  .template-card,
-  .recap-card {
-    padding: 1rem 0.7rem 0.7rem 0.7rem;
-  }
-  .template-title,
-  .recap-title {
+  .crp-title {
     font-size: 1rem;
   }
-  .template-btn,
-  .recap-btn {
-    font-size: 0.95rem;
+  .crp-btn {
+    font-size: 0.9rem;
     padding: 0.4rem 0.7rem;
+    min-width: 5.5rem;
+    max-width: 10rem;
+  }
+  .crp-badge,
+  .crp-pages,
+  .crp-author-badge {
+    font-size: 0.7rem;
+    max-width: 5rem;
   }
 }

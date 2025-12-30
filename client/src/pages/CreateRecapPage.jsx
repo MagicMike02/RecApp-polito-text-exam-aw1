@@ -22,15 +22,17 @@ function CreateRecapPage() {
         setLoading(true);
         setError(null);
 
-		const themesResult = await getThemes();
+        const themesResult = await getThemes();
         setThemes(themesResult);
+        console.log(themesResult);
 
-		if (themesResult.length > 0) {
+        if (themesResult.length > 0) {
           setSelectedTheme(themesResult[0].id);
         }
 
-		const recapsResult = await getPublicRecaps();
+        const recapsResult = await getPublicRecaps();
         setPublicRecaps(recapsResult);
+        console.log(recapsResult);
       } catch (err) {
         setError(err.message || "Error loading data");
       } finally {
@@ -63,7 +65,7 @@ function CreateRecapPage() {
 
   if (loading) {
     return (
-      <div className="create-recap-container" style={{ textAlign: "center" }}>
+      <div className="crp-create-recap-container crp-center-text">
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Loading...</span>
         </Spinner>
@@ -74,7 +76,7 @@ function CreateRecapPage() {
 
   if (error) {
     return (
-      <div className="create-recap-container">
+      <div className="crp-create-recap-container">
         <Alert variant="danger">
           <Alert.Heading>Error</Alert.Heading>
           <p>{error}</p>
@@ -84,46 +86,47 @@ function CreateRecapPage() {
   }
 
   return (
-    <div className="create-recap-container">
-      <div className="create-recap-header">
-        <h1 className="create-recap-title">Crea un nuovo riepilogo</h1>
-        <button className="create-recap-cancel" onClick={() => navigate("/profile")}>
+    <div className="crp-create-recap-container">
+      <div className="crp-create-recap-header">
+        <h1 className="crp-create-recap-title">Crea un nuovo riepilogo</h1>
+        <button className="crp-create-recap-cancel" onClick={() => navigate("/profile")}>
           Annulla
         </button>
       </div>
 
-      <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="create-recap-tabs mb-4">
+      <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="crp-create-recap-tabs mb-4">
         <Tab eventKey="templates" title="Da Template">
-          <div className="create-recap-section">
-            <h2 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 12 }}>Scegli un tema:</h2>
-            <div className="theme-btns">
+          <div className="crp-create-recap-section">
+            <h2 className="crp-theme-title">Scegli un tema:</h2>
+            <div className="crp-theme-btns">
               {themes.map((theme) => (
                 <button
                   key={theme.id}
-                  className={`theme-btn${selectedTheme === theme.id ? " selected" : ""}`}
+                  className={`crp-theme-btn${selectedTheme === theme.id ? " selected" : ""}`}
                   onClick={() => setSelectedTheme(theme.id)}
                 >
                   {theme.name}
                 </button>
               ))}
             </div>
+
             {templates.length === 0 ? (
               <Alert variant="info">Nessun template disponibile per questo tema.</Alert>
             ) : (
-              <div className="template-list">
+              <div className="crp-list">
                 {templates.map((template) => (
-                  <div key={template.id} className="template-card">
-                    <div className="template-title">{template.name}</div>
-                    <div className="template-desc">{template.description}</div>
-                    <div className="template-badges">
-                      <span className="template-badge">
-                        {themes.find((t) => t.id === template.theme_id)?.name}
-                      </span>
-                      <span className="template-pages">{template.pages_count || 3} pagine</span>
+                  <div key={template.id} className="crp-card">
+                    <div className="crp-title">{template.name}</div>
+                    <div className="crp-desc">{template.description}</div>
+                    <div className="crp-badges">
+                      <span className="crp-badge">{themes.find((t) => t.id === template.theme_id)?.name}</span>
+                      <span className="crp-pages">{template.pages_count || 3} pagine</span>
                     </div>
-                    <button className="template-btn" onClick={() => handleCreateFromTemplate(template.id)}>
-                      Usa questo template
-                    </button>
+                    <div className="crp-btn-row">
+                      <button className="crp-btn" onClick={() => handleCreateFromTemplate(template.id)}>
+                        Usa template
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -132,32 +135,42 @@ function CreateRecapPage() {
         </Tab>
 
         <Tab eventKey="recaps" title="Da Recap Pubblico">
-          <div className="create-recap-section">
+          <div className="crp-create-recap-section">
             <Alert variant="info">
               Crea un nuovo recap ispirato a un recap pubblico. La tua versione terrà traccia dell'originale.
             </Alert>
             {publicRecaps.length === 0 ? (
               <Alert variant="warning">Nessun recap pubblico disponibile.</Alert>
             ) : (
-              <div className="recap-list">
+              <div className="crp-list">
                 {publicRecaps.map((recap) => (
-                  <div key={recap.id} className="recap-card">
-                    <div className="recap-title">{recap.title}</div>
-                    <div className="recap-meta">
-                      <span style={{ color: "var(--primary-color)", fontWeight: 600 }}>{recap.theme_name}</span>
-                      {" | "}
-                      <span>
+                  <div key={recap.id} className="crp-card">
+                    {recap.pages && recap.pages[0] && recap.pages[0].background_url && (
+                      <img
+                        src={recap.pages[0].background_url}
+                        alt={recap.title + " cover"}
+                        className="crp-preview-img"
+                      />
+                    )}
+                    <div className="crp-title">{recap.title}</div>
+                    <div className="crp-badges">
+                      <span className="crp-badge">{recap.theme_name}</span>
+                      <span className="crp-pages">
+                        {recap.pages_count || (recap.pages ? recap.pages.length : 0)} pagine
+                      </span>
+
+                      <br />
+
+                      <span className="crp-author-badge">
                         by <strong>{recap.author_name}</strong>
                       </span>
-                      {" | "}
-                      <span>{recap.pages_count} pagine</span>
                     </div>
-                    <div className="recap-btns">
-                      <button className="recap-btn" onClick={() => navigate(`/recaps/${recap.id}`)}>
+                    <div className="crp-btn-row">
+                      <button className="crp-btn" onClick={() => navigate(`/recaps/${recap.id}`)}>
                         Anteprima
                       </button>
-                      <button className="recap-btn" onClick={() => handleCreateFromRecap(recap.id)}>
-                        Usa come template
+                      <button className="crp-btn" onClick={() => handleCreateFromRecap(recap.id)}>
+                        Usa template
                       </button>
                     </div>
                   </div>
