@@ -37,7 +37,7 @@ function App() {
           }
         />
         <Route
-          path="/create/from-template/:templateId"
+          path="/editor/new"
           element={
             <ProtectedRoute>
               <RecapEditorPage />
@@ -45,7 +45,7 @@ function App() {
           }
         />
         <Route
-          path="/create/from-recap/:recapId"
+          path="/editor/:id"
           element={
             <ProtectedRoute>
               <RecapEditorPage />

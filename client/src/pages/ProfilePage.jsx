@@ -14,7 +14,6 @@ function ProfilePage() {
     setLoading(true);
     getUserRecaps()
       .then((data) => {
-        console.log("Recap personali ricevuti:", data);
         setError("");
         setRecaps(data);
         setLoading(false);
