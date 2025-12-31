@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import "./RecapViewPage.css";
 import { useParams, useNavigate } from "react-router-dom";
 import { getRecapById } from "../services/apiService";
 import Spinner from "../components/utils/Spinner";
 import Alert from "../components/utils/Alert";
+import { FALLBACK_IMAGE_URL } from "../constants";
+import "./RecapViewPage.css";
 
 function RecapViewPage() {
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ function RecapViewPage() {
         </button>
         <h2 className="recap-title">{recap.title}</h2>
       </div>
+	   
       <div className="recap-info">
         <div className="recap-card-meta" style={{ justifyContent: "center" }}>
           <span className="recap-card-badge-author">di {recap.author_name}</span>
@@ -62,7 +64,7 @@ function RecapViewPage() {
       <div className="recap-slideshow">
         <div className="recap-slideshow-img-wrapper" style={{ position: "relative" }}>
           <img
-            src={page.background_image_url}
+            src={page.background_image_url || FALLBACK_IMAGE_URL}
             alt={"Pagina " + (currentPage + 1)}
             className="recap-slideshow-img"
             style={{ width: "100%", borderRadius: "16px", boxShadow: "0 4px 24px rgba(15,118,110,0.10)" }}

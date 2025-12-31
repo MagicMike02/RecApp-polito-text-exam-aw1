@@ -229,3 +229,19 @@ body {
   display: block;
   text-transform: uppercase;
 }
+
+/* --- PAGE HEADER STYLES --- */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 2rem 0 2rem;
+  min-height: 80px;
+}
+
+.page-title {
+  color: var(--primary-color);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+}

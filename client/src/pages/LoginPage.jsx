@@ -17,7 +17,6 @@ function LoginPage() {
     const password = formData.get("password");
 
     if (!username || !password) {
-      // Ritorna l'errore E lo username inserito
       return { error: "Inserisci username e password", prevUsername: username };
     }
 
@@ -27,7 +26,6 @@ function LoginPage() {
         navigate("/");
         return { error: null };
       } else {
-        // Ritorna l'errore E lo username inserito
         return { error: "Credenziali errate", prevUsername: username };
       }
     } catch (err) {
@@ -38,7 +36,7 @@ function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, { error: null });
 
   return (
-    <Container className="login-container">
+    <Container fluid className="login-container">
       <Card className="login-card">
         <Card.Body className="login-card-body">
           <div className="login-header">

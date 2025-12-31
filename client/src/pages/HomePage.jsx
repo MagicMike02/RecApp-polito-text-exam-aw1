@@ -23,9 +23,9 @@ function HomePage() {
 
   return (
     <div>
-      <h2 style={{ color: "var(--primary-color)", marginBlock: "1.5rem", paddingLeft: "2rem" }}>
-        Lasciati ispirare dagli altri!
-      </h2>
+      <div className="page-header">
+        <h2 className="page-title">Lasciati ispirare dagli altri!</h2>
+      </div>
       <RecapList recaps={recaps} loading={loading} error={error} />
     </div>
   );
