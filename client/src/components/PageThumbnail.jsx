@@ -4,7 +4,7 @@ import "./PageThumbnail.css";
 
 /**
  * PageThumbnail - Miniatura di una pagina con controlli di azione
- * 
+ *
  * Mostra una preview ridotta della pagina nella sidebar dell'editor.
  * Include pulsanti per selezione, riordino (su/giù) e eliminazione.
  */
@@ -41,7 +41,7 @@ function PageThumbnail({
               <path d="M8 3l-5 5h10L8 3z" />
             </svg>
           </button>
-          
+
           {/* Riordina giù */}
           <button
             className="page-thumbnail-btn page-thumbnail-btn-move"
@@ -57,7 +57,7 @@ function PageThumbnail({
               <path d="M8 13l5-5H3l5 5z" />
             </svg>
           </button>
-          
+
           {/* Elimina */}
           <button
             className="page-thumbnail-btn page-thumbnail-btn-delete"

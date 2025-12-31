@@ -4,7 +4,7 @@ import { FALLBACK_IMAGE } from "../utils/constants";
 
 /**
  * BackgroundSelector - Grid di selezione immagini di background
- * 
+ *
  * Mostra una griglia responsive di thumbnails cliccabili.
  * Evidenzia il background attualmente selezionato.
  */
@@ -23,7 +23,7 @@ function BackgroundSelector({ backgrounds, selectedId, onSelect }) {
         {backgrounds.map((bg) => {
           const isSelected = bg.id === selectedId;
           const imageUrl = bg.url || FALLBACK_IMAGE;
-          
+
           return (
             <div
               key={bg.id}
@@ -39,10 +39,7 @@ function BackgroundSelector({ backgrounds, selectedId, onSelect }) {
               }}
             >
               {/* Thumbnail image */}
-              <div
-                className="background-selector-thumbnail"
-                style={{ backgroundImage: `url(${imageUrl})` }}
-              >
+              <div className="background-selector-thumbnail" style={{ backgroundImage: `url(${imageUrl})` }}>
                 {/* Badge con numero di campi testo */}
                 {bg.text_fields_count && (
                   <span className="background-selector-badge">
@@ -50,17 +47,11 @@ function BackgroundSelector({ backgrounds, selectedId, onSelect }) {
                   </span>
                 )}
               </div>
-              
+
               {/* Checkmark per il selezionato */}
               {isSelected && (
                 <div className="background-selector-check">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="12" cy="12" r="12" fill="var(--primary-color)" />
                     <path
                       d="M7 12L10.5 15.5L17 9"

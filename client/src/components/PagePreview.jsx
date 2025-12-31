@@ -1,4 +1,3 @@
-
 import PropTypes from "prop-types";
 import "./PagePreview.css";
 import { FALLBACK_IMAGE } from "../utils/constants";

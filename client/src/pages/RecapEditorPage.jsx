@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import {
-  getTemplateById,
-  getRecapById,
-  getImagesByTheme,
-  createRecap,
-} from "../services/apiService";
+import { getTemplateById, getRecapById, getImagesByTheme, createRecap } from "../services/apiService";
 import PagePreview from "../components/PagePreview";
 import BackgroundSelector from "../components/BackgroundSelector";
 import PageThumbnail from "../components/PageThumbnail";
@@ -111,18 +106,14 @@ function RecapEditorPage() {
   const updatePageText = (field, value) => {
     setRecapData((prev) => ({
       ...prev,
-      pages: prev.pages.map((page, i) =>
-        i === currentPageIndex ? { ...page, [field]: value } : page
-      ),
+      pages: prev.pages.map((page, i) => (i === currentPageIndex ? { ...page, [field]: value } : page)),
     }));
   };
 
   const selectBackground = (bgId) => {
     setRecapData((prev) => ({
       ...prev,
-      pages: prev.pages.map((page, i) =>
-        i === currentPageIndex ? { ...page, background_image_id: bgId } : page
-      ),
+      pages: prev.pages.map((page, i) => (i === currentPageIndex ? { ...page, background_image_id: bgId } : page)),
     }));
   };
 
@@ -132,10 +123,7 @@ function RecapEditorPage() {
   const addPage = () => {
     setRecapData((prev) => ({
       ...prev,
-      pages: [
-        ...prev.pages,
-        { background_image_id: null, text_1: "", text_2: "", text_3: "" },
-      ],
+      pages: [...prev.pages, { background_image_id: null, text_1: "", text_2: "", text_3: "" }],
     }));
     // Seleziona automaticamente la nuova pagina
     setCurrentPageIndex(recapData.pages.length);
@@ -163,10 +151,7 @@ function RecapEditorPage() {
     if (toIndex < 0 || toIndex >= recapData.pages.length) return;
 
     const newPages = [...recapData.pages];
-    [newPages[fromIndex], newPages[toIndex]] = [
-      newPages[toIndex],
-      newPages[fromIndex],
-    ];
+    [newPages[fromIndex], newPages[toIndex]] = [newPages[toIndex], newPages[fromIndex]];
     setRecapData((prev) => ({ ...prev, pages: newPages }));
 
     // Aggiorna l'indice corrente se la pagina selezionata è stata mossa
@@ -237,18 +222,14 @@ function RecapEditorPage() {
   }
 
   const currentPage = recapData.pages[currentPageIndex];
-  const currentBackground = backgrounds.find(
-    (bg) => bg.id === currentPage?.background_image_id
-  );
+  const currentBackground = backgrounds.find((bg) => bg.id === currentPage?.background_image_id);
 
   return (
     <div className="editor-container">
       {/* SIDEBAR SINISTRA - Lista Pagine */}
       <aside className="editor-sidebar">
         <div className="editor-sidebar-header">
-          <h3 className="editor-sidebar-title">
-            Pagine ({recapData.pages.length})
-          </h3>
+          <h3 className="editor-sidebar-title">Pagine ({recapData.pages.length})</h3>
         </div>
 
         <div className="editor-sidebar-content">
@@ -271,12 +252,7 @@ function RecapEditorPage() {
 
         <div className="editor-sidebar-footer">
           <button className="btn-add-page" onClick={addPage}>
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10 5v10M5 10h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
             Aggiungi Pagina
@@ -333,9 +309,7 @@ function RecapEditorPage() {
 
           {/* Testi Pagina Corrente */}
           <div className="editor-section">
-            <h3 className="editor-section-title">
-              Pagina {currentPageIndex + 1}
-            </h3>
+            <h3 className="editor-section-title">Pagina {currentPageIndex + 1}</h3>
 
             {currentBackground ? (
               <>
@@ -403,11 +377,7 @@ function RecapEditorPage() {
           >
             {saving ? "Salvataggio..." : "Salva Riepilogo"}
           </button>
-          <button
-            className="btn btn-outline-nav w-100"
-            onClick={() => navigate(-1)}
-            disabled={saving}
-          >
+          <button className="btn btn-outline-nav w-100" onClick={() => navigate(-1)} disabled={saving}>
             Annulla
           </button>
         </div>
