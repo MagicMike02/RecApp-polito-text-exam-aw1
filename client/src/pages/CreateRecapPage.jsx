@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab, Alert, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { getThemes, getTemplatesByTheme, getPublicRecaps } from "../services/apiService";
+import {
+  getThemes,
+  getTemplatesByTheme,
+  getPublicRecaps,
+  getImagesByTheme,
+  getTemplateById,
+} from "../services/apiService";
+import RecapGalleryCard from "../components/RecapGalleryCard";
 import "./CreateRecapPage.css";
 
 function CreateRecapPage() {
@@ -11,6 +18,7 @@ function CreateRecapPage() {
   const [themes, setThemes] = useState([]);
   const [selectedTheme, setSelectedTheme] = useState(null);
   const [templates, setTemplates] = useState([]);
+  const [themeBackgrounds, setThemeBackgrounds] = useState([]);
 
   const [publicRecaps, setPublicRecaps] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,16 +51,23 @@ function CreateRecapPage() {
   }, []);
 
   useEffect(() => {
-    const fetchTemplates = async () => {
+    const fetchTemplatesAndBackgrounds = async () => {
       if (!selectedTheme) return;
       try {
-        const result = await getTemplatesByTheme(selectedTheme);
-        setTemplates(result);
+        // Prendi solo i metadati dei template
+        const [templatesMeta, themeBackgroundsResult] = await Promise.all([
+          getTemplatesByTheme(selectedTheme),
+          getImagesByTheme(selectedTheme),
+        ]);
+        // Prendi i dettagli di ogni template (con pages)
+        const templatesFull = await Promise.all(templatesMeta.map((t) => getTemplateById(t.id)));
+        setTemplates(templatesFull);
+        setThemeBackgrounds(themeBackgroundsResult);
       } catch (err) {
-        setError(err.message || "Error loading templates");
+        setError(err.message || "Error loading templates or backgrounds");
       }
     };
-    fetchTemplates();
+    fetchTemplatesAndBackgrounds();
   }, [selectedTheme]);
 
   const handleCreateFromTemplate = (templateId) => {
@@ -97,7 +112,10 @@ function CreateRecapPage() {
       <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="crp-create-recap-tabs mb-4">
         <Tab eventKey="templates" title="Da Template">
           <div className="crp-create-recap-section">
+            {/* TITOLO */}
             <h2 className="crp-theme-title">Scegli un tema:</h2>
+
+            {/* BOTTONI SELEZIONE TEMA */}
             <div className="crp-theme-btns">
               {themes.map((theme) => (
                 <button
@@ -110,25 +128,29 @@ function CreateRecapPage() {
               ))}
             </div>
 
+            {/* LISTA TEMPLATE */}
             {templates.length === 0 ? (
               <Alert variant="info">Nessun template disponibile per questo tema.</Alert>
             ) : (
               <div className="crp-list">
-                {templates.map((template) => (
-                  <div key={template.id} className="crp-card">
-                    <div className="crp-title">{template.name}</div>
-                    <div className="crp-desc">{template.description}</div>
-                    <div className="crp-badges">
-                      <span className="crp-badge">{themes.find((t) => t.id === template.theme_id)?.name}</span>
-                      <span className="crp-pages">{template.pages_count || 3} pagine</span>
-                    </div>
-                    <div className="crp-btn-row">
-                      <button className="crp-btn" onClick={() => handleCreateFromTemplate(template.id)}>
-                        Usa template
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                {templates.map((template) => {
+                  if (!Array.isArray(template.pages)) return null;
+                  const pages = template.pages.map((page) => {
+                    const bg = themeBackgrounds.find((bg) => bg.id === page.background_image_id);
+                    return { background_url: bg ? bg.url : "" };
+                  });
+                  const fakeRecapFromTemplate = {
+                    id: template.id,
+                    title: template.name,
+                    author_name: "Template",
+                    theme_name: themes.find((t) => t.id === template.theme_id)?.name,
+                    visibility: "public",
+                    pages,
+                    description: template.description,
+                    onUse: () => handleCreateFromTemplate(template.id),
+                  };
+                  return <RecapGalleryCard key={template.id} recap={fakeRecapFromTemplate} showDesc showUseBtn />;
+                })}
               </div>
             )}
           </div>
@@ -144,36 +166,16 @@ function CreateRecapPage() {
             ) : (
               <div className="crp-list">
                 {publicRecaps.map((recap) => (
-                  <div key={recap.id} className="crp-card">
-                    {recap.pages && recap.pages[0] && recap.pages[0].background_url && (
-                      <img
-                        src={recap.pages[0].background_url}
-                        alt={recap.title + " cover"}
-                        className="crp-preview-img"
-                      />
-                    )}
-                    <div className="crp-title">{recap.title}</div>
-                    <div className="crp-badges">
-                      <span className="crp-badge">{recap.theme_name}</span>
-                      <span className="crp-pages">
-                        {recap.pages_count || (recap.pages ? recap.pages.length : 0)} pagine
-                      </span>
-
-                      <br />
-
-                      <span className="crp-author-badge">
-                        by <strong>{recap.author_name}</strong>
-                      </span>
-                    </div>
-                    <div className="crp-btn-row">
-                      <button className="crp-btn" onClick={() => navigate(`/recaps/${recap.id}`)}>
-                        Anteprima
-                      </button>
-                      <button className="crp-btn" onClick={() => handleCreateFromRecap(recap.id)}>
-                        Usa template
-                      </button>
-                    </div>
-                  </div>
+                  <RecapGalleryCard
+                    key={recap.id}
+                    recap={{
+                      ...recap,
+                      onPreview: () => navigate(`/recaps/${recap.id}`),
+                      onUse: () => handleCreateFromRecap(recap.id),
+                    }}
+                    showUseBtn
+                    showPreviewBtn
+                  />
                 ))}
               </div>
             )}

@@ -27,10 +27,8 @@ function ProfilePage() {
 
   return (
     <div>
-      <div
-        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "2rem 2rem 0 2rem" }}
-      >
-        <h2 style={{ color: "var(--primary-color)", margin: 0 }}>I tuoi recap</h2>
+      <div className="page-header">
+        <h2 className="page-title">I tuoi recap</h2>
         <CreateRecapButton onClick={() => navigate("/create")}>+ Crea nuovo riepilogo</CreateRecapButton>
       </div>
       <RecapList recaps={recaps} loading={loading} error={error} />
