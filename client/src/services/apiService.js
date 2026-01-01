@@ -17,9 +17,18 @@ apiClient.interceptors.response.use(
 	(error) => {
 		if (error.response) {
 			// Handle HTTP errors
-			const errorMessage = error.response.data?.error || 'API call failed';
-			console.error(`API call failed: ${errorMessage}`);
-			return Promise.reject(new Error(errorMessage));
+			const errorData = error.response.data;
+			const errorMessage = errorData?.message || errorData?.error || 'API call failed';
+			const errorDetails = errorData?.errors ? JSON.stringify(errorData.errors, null, 2) : null;
+			
+			console.error(`[API ERROR ${error.response.status}]`, {
+				message: errorMessage,
+				details: errorDetails,
+				fullResponse: errorData,
+			});
+			
+			const fullError = errorDetails ? `${errorMessage}\n\nDettagli:\n${errorDetails}` : errorMessage;
+			return Promise.reject(new Error(fullError));
 		}
 		console.error('Network error:', error.message);
 		return Promise.reject(error);
@@ -30,13 +39,21 @@ apiClient.interceptors.response.use(
 async function apiCall(endpoint, options = {}) {
 	const { method = 'GET', data, params, headers } = options;
 
-	return apiClient.request({
-		url: endpoint,
-		method,
-		data,
-		params,
-		headers,
-	});
+	try {
+		console.log(`[API] ${method} ${endpoint}`, data || params); // Log della richiesta
+		const result = await apiClient.request({
+			url: endpoint,
+			method,
+			data,
+			params,
+			headers,
+		});
+		console.log(`[API SUCCESS] ${method} ${endpoint}`, result); // Log della risposta
+		return result;
+	} catch (error) {
+		console.error(`[API EXCEPTION] ${method} ${endpoint}:`, error.message);
+		throw error;
+	}
 }
 
 // ==================== AUTH API ====================

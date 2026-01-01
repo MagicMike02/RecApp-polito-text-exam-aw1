@@ -2,9 +2,8 @@ import { useState, useActionState } from "react";
 import "./LoginPage.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Container, Card, Form, Button } from "react-bootstrap";
+import { Container, Card, Form, Button, Alert } from "react-bootstrap";
 import { Eye, EyeSlash } from "react-bootstrap-icons";
-import CustomAlert from "../components/utils/Alert";
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -43,7 +42,7 @@ function LoginPage() {
             <h2 className="login-title">RecapApp</h2>
           </div>
 
-          {state?.error && <CustomAlert message={state.error} type="error" />}
+          {state?.error && <Alert variant="danger">{state.error}</Alert>}
 
           <Form action={formAction} className="login-form">
             <div className="login-group">

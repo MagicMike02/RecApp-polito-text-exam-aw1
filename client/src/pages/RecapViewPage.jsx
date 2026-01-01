@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getRecapById } from "../services/apiService";
+import { getRecapById, deleteRecap } from "../services/apiService";
 import Spinner from "../components/utils/Spinner";
-import Alert from "../components/utils/Alert";
+import { Alert } from "react-bootstrap";
 import { FALLBACK_IMAGE_URL } from "../constants";
 import "./RecapViewPage.css";
 
@@ -29,8 +29,20 @@ function RecapViewPage() {
       });
   }, [id]);
 
+  const handleDelete = async () => {
+    if (window.confirm("Sei sicuro di voler eliminare questo recap?")) {
+      try {
+        await deleteRecap(id);
+        alert("Recap eliminato con successo.");
+        navigate("/profile");
+      } catch (error) {
+        alert(`Errore durante l'eliminazione: ${error.message}`);
+      }
+    }
+  };
+
   if (loading) return <Spinner />;
-  if (error) return <Alert message={error} type="error" />;
+  if (error) return <Alert variant="danger">{error}</Alert>;
   if (!recap) return null;
 
   const pages = recap.pages || [];
@@ -43,8 +55,11 @@ function RecapViewPage() {
           &larr; Torna indietro
         </button>
         <h2 className="recap-title">{recap.title}</h2>
+        <button className="delete-btn" onClick={handleDelete}>
+          Elimina
+        </button>
       </div>
-	   
+
       <div className="recap-info">
         <div className="recap-card-meta" style={{ justifyContent: "center" }}>
           <span className="recap-card-badge-author">di {recap.author_name}</span>

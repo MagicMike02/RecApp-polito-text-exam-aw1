@@ -133,7 +133,8 @@ router.put('/:id', isAuthenticated, validateUpdateRecap, async (req, res) => {
 router.delete('/:id', isAuthenticated, validateRecapId, async (req, res) => {
 	try {
 		const { id } = req.params;
-		const recap = await recapDao.getRecapById(parseInt(id));
+		const userId = req.user ? req.user.id : null;
+		const recap = await recapDao.getRecapById(parseInt(id), userId);
 
 		if (!recap) {
 			return res.status(404).json({ error: 'Recap not found' });
@@ -143,7 +144,10 @@ router.delete('/:id', isAuthenticated, validateRecapId, async (req, res) => {
 			return res.status(403).json({ error: 'Forbidden: You do not have permission to delete this recap' });
 		}
 
-		await recapDao.deleteRecap(parseInt(id));
+		const deleted = await recapDao.deleteRecap(parseInt(id), req.user.id);
+		if (!deleted) {
+			return res.status(500).json({ error: 'Failed to delete recap' });
+		}
 		res.json({ message: 'Recap deleted successfully' });
 	} catch (error) {
 		console.error('Error deleting recap:', error);

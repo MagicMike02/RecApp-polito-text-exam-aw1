@@ -8,6 +8,7 @@ import { SERVER, SESSION } from './config.js';
 import { getUserByUsername, getUserById } from './dao/userDao.js';
 import { verifyPassword } from './utils/crypto.js';
 import { logger, requestLogger } from './utils/logger.js';
+import { loggerMiddleware, errorLoggerMiddleware } from './middlewares/loggerMiddleware.js';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import themeRoutes from './routes/themeRoutes.js';
@@ -15,6 +16,9 @@ import imageRoutes from './routes/imageRoutes.js';
 import recapRoutes from './routes/recapRoutes.js';
 
 const app = express();
+
+// Logging middleware - registra tutte le richieste
+app.use(loggerMiddleware);
 
 app.use(requestLogger);
 app.use(express.json());

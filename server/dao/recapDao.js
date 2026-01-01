@@ -227,10 +227,13 @@ export async function updateRecapPage(id, { background_image_id, text_field_1, t
 export async function deleteRecap(id, userId) {
 	const db = await openDatabase();
 	try {
+		console.log('Attempting to delete recap with id:', id, 'and userId:', userId);
+		// Delete the recap itself
 		const result = await db.run(
-			'DELETE FROM recaps WHERE id = ? AND user_id = ?',
+			'DELETE FROM recaps WHERE id = ? AND user_id = ?;',
 			[id, userId]
 		);
+		console.log('Delete result:', result);
 		return result.changes > 0;
 	} finally {
 		await db.close();
@@ -240,7 +243,7 @@ export async function deleteRecap(id, userId) {
 export async function deleteRecapPage(id) {
 	const db = await openDatabase();
 	try {
-		const result = await db.run('DELETE FROM recap_pages WHERE id = ?', [id]);
+		const result = await db.run('DELETE FROM recap_pages WHERE id = ?;', [id]);
 		return result.changes > 0;
 	} finally {
 		await db.close();

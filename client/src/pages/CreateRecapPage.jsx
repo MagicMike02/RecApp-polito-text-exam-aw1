@@ -32,7 +32,6 @@ function CreateRecapPage() {
 
         const themesResult = await getThemes();
         setThemes(themesResult);
-        console.log(themesResult);
 
         if (themesResult.length > 0) {
           setSelectedTheme(themesResult[0].id);
@@ -40,7 +39,6 @@ function CreateRecapPage() {
 
         const recapsResult = await getPublicRecaps();
         setPublicRecaps(recapsResult);
-        console.log(recapsResult);
       } catch (err) {
         setError(err.message || "Error loading data");
       } finally {
