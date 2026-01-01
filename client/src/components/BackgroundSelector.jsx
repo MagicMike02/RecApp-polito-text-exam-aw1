@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import "./BackgroundSelector.css";
-import { FALLBACK_IMAGE } from "../utils/constants";
+import { FALLBACK_IMAGE_URL } from "../constants";
 
 /**
  * BackgroundSelector - Grid di selezione immagini di background
@@ -22,7 +22,7 @@ function BackgroundSelector({ backgrounds, selectedId, onSelect }) {
       <div className="background-selector-grid">
         {backgrounds.map((bg) => {
           const isSelected = bg.id === selectedId;
-          const imageUrl = bg.url || FALLBACK_IMAGE;
+          const imageUrl = bg.url || FALLBACK_IMAGE_URL;
 
           return (
             <div

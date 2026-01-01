@@ -4,7 +4,7 @@ import { getTemplateById, getRecapById, getImagesByTheme, createRecap } from "..
 import PagePreview from "../components/PagePreview";
 import BackgroundSelector from "../components/BackgroundSelector";
 import PageThumbnail from "../components/PageThumbnail";
-import Alert from "../components/utils/Alert";
+import { Alert } from "react-bootstrap";
 import Spinner from "../components/utils/Spinner";
 import "./RecapEditorPage.css";
 
@@ -17,7 +17,7 @@ function RecapEditorPage() {
     title: "",
     visibility: "private",
     theme_id: null,
-    original_summary_id: null,
+    derived_from_recap_id: null,
     pages: [],
   });
 
@@ -27,6 +27,7 @@ function RecapEditorPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   // ============================================
   // INIZIALIZZAZIONE
@@ -49,12 +50,13 @@ function RecapEditorPage() {
             title: `Nuovo ${template.name}`,
             visibility: "private",
             theme_id: template.theme_id,
-            original_summary_id: null,
-            pages: template.pages.map((p) => ({
+            derived_from_recap_id: null,
+            pages: template.pages.map((p, index) => ({
+              page_number: index + 1,
               background_image_id: p.background_image_id,
-              text_1: "",
-              text_2: "",
-              text_3: "",
+              text_field_1: "",
+              text_field_2: "",
+              text_field_3: "",
             })),
           });
           setBackgrounds(bgImages);
@@ -67,12 +69,13 @@ function RecapEditorPage() {
             title: `Copia di ${recap.title}`,
             visibility: "private",
             theme_id: recap.theme_id,
-            original_summary_id: recap.id,
-            pages: recap.pages.map((p) => ({
+            derived_from_recap_id: recap.id,
+            pages: recap.pages.map((p, index) => ({
+              page_number: index + 1,
               background_image_id: p.background_image_id,
-              text_1: p.text_1 || "",
-              text_2: p.text_2 || "",
-              text_3: p.text_3 || "",
+              text_field_1: p.text_field_1 || "",
+              text_field_2: p.text_field_2 || "",
+              text_field_3: p.text_field_3 || "",
             })),
           });
           setBackgrounds(bgImages);
@@ -123,7 +126,16 @@ function RecapEditorPage() {
   const addPage = () => {
     setRecapData((prev) => ({
       ...prev,
-      pages: [...prev.pages, { background_image_id: null, text_1: "", text_2: "", text_3: "" }],
+      pages: [
+        ...prev.pages,
+        {
+          page_number: prev.pages.length + 1,
+          background_image_id: null,
+          text_field_1: "",
+          text_field_2: "",
+          text_field_3: "",
+        },
+      ],
     }));
     // Seleziona automaticamente la nuova pagina
     setCurrentPageIndex(recapData.pages.length);
@@ -172,9 +184,24 @@ function RecapEditorPage() {
     if (recapData.pages.length < 3) {
       return "Servono almeno 3 pagine";
     }
-    if (recapData.pages.some((p) => !p.background_image_id)) {
-      return "Ogni pagina deve avere un background selezionato";
+
+    // Validazione per ogni pagina
+    for (let i = 0; i < recapData.pages.length; i++) {
+      const page = recapData.pages[i];
+
+      // Controlla che il background sia selezionato
+      if (!page.background_image_id) {
+        return `Pagina ${i + 1}: devi selezionare un background`;
+      }
+
+      // Controlla che almeno un campo di testo sia compilato
+      const hasText = page.text_field_1?.trim() || page.text_field_2?.trim() || page.text_field_3?.trim();
+
+      if (!hasText) {
+        return `Pagina ${i + 1}: devi inserire almeno un testo`;
+      }
     }
+
     return null;
   };
 
@@ -183,16 +210,44 @@ function RecapEditorPage() {
     const validationError = validateRecap();
     if (validationError) {
       setError(validationError);
+      setSuccess(null);
       return;
     }
 
     try {
       setSaving(true);
       setError(null);
-      await createRecap(recapData);
-      navigate("/profile");
+      setSuccess(null);
+
+      // Prepara i dati per l'API
+      const payload = {
+        ...recapData,
+        derived_from_recap_id: recapData.derived_from_recap_id || undefined,
+      };
+
+      await createRecap(payload);
+
+      // Mostra successo prima di navigare
+      setSuccess("✓ Recap creato con successo!");
+      setTimeout(() => {
+        navigate("/profile");
+      }, 1500);
     } catch (err) {
-      setError(err.message || "Errore durante il salvataggio");
+      // Cerca di estrarre messaggio di errore dall'API
+      let errorMsg = "Errore durante il salvataggio";
+
+      if (err.response?.data?.errors) {
+        // Errori di validazione dal backend
+        const errors = err.response.data.errors;
+        errorMsg = errors.map((e) => e.msg).join(", ");
+      } else if (err.response?.data?.error) {
+        errorMsg = err.response.data.error;
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+
+      setError(errorMsg);
+      setSuccess(null);
     } finally {
       setSaving(false);
     }
@@ -213,7 +268,7 @@ function RecapEditorPage() {
   if (error && !recapData.theme_id) {
     return (
       <div className="editor-error">
-        <Alert type="error">{error}</Alert>
+        <Alert variant="danger">{error}</Alert>
         <button className="btn btn-primary-custom" onClick={() => navigate("/create")}>
           Torna alla creazione
         </button>
@@ -277,7 +332,8 @@ function RecapEditorPage() {
         </div>
 
         <div className="editor-controls-content">
-          {error && <Alert type="error">{error}</Alert>}
+          {success && <Alert variant="success">{success}</Alert>}
+          {error && <Alert variant="danger">{error}</Alert>}
 
           {/* Titolo e Visibilità */}
           <div className="editor-section">
@@ -318,8 +374,8 @@ function RecapEditorPage() {
                   <textarea
                     className="form-control"
                     rows="3"
-                    value={currentPage.text_1}
-                    onChange={(e) => updatePageText("text_1", e.target.value)}
+                    value={currentPage.text_field_1}
+                    onChange={(e) => updatePageText("text_field_1", e.target.value)}
                     placeholder="Inserisci il primo testo..."
                   />
                 </div>
@@ -330,8 +386,8 @@ function RecapEditorPage() {
                     <textarea
                       className="form-control"
                       rows="3"
-                      value={currentPage.text_2}
-                      onChange={(e) => updatePageText("text_2", e.target.value)}
+                      value={currentPage.text_field_2}
+                      onChange={(e) => updatePageText("text_field_2", e.target.value)}
                       placeholder="Inserisci il secondo testo..."
                     />
                   </div>
@@ -343,8 +399,8 @@ function RecapEditorPage() {
                     <textarea
                       className="form-control"
                       rows="3"
-                      value={currentPage.text_3}
-                      onChange={(e) => updatePageText("text_3", e.target.value)}
+                      value={currentPage.text_field_3}
+                      onChange={(e) => updatePageText("text_field_3", e.target.value)}
                       placeholder="Inserisci il terzo testo..."
                     />
                   </div>

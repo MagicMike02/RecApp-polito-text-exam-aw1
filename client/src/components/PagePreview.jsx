@@ -1,43 +1,63 @@
 import PropTypes from "prop-types";
 import "./PagePreview.css";
-import { FALLBACK_IMAGE } from "../utils/constants";
+import { FALLBACK_IMAGE_URL } from "../constants";
 
 /**
  * PagePreview - Componente per visualizzare una pagina con background e testi sovrapposti
  *
- * Gestisce il posizionamento dinamico dei testi in base al layout_type del background:
- * - CENTER: Testo centrato
- * - TOP_DOWN: Testi dall'alto verso il basso
- * - LEFT_RIGHT: Testi distribuiti orizzontalmente
- * - BOTTOM_UP: Testi dal basso verso l'alto
+ * Utilizza le coordinate precise (text_positions) dal database per posizionare i testi.
+ * Le coordinate sono espresse in percentuali: { x, y, w, h } dove:
+ * - x, y: posizione top-left del box di testo (0-1)
+ * - w, h: larghezza e altezza del box di testo (0-1)
  */
 function PagePreview({ page, background, className = "" }) {
-  if (!page || !background) {
-    return (
-      <div className={`page-preview page-preview-empty ${className}`}>
-        <p className="page-preview-placeholder">Seleziona un background per visualizzare la pagina</p>
-      </div>
-    );
-  }
+  const backgroundUrl = background?.url || FALLBACK_IMAGE_URL;
+  const textPositions = background?.text_positions?.fields || [];
+  const isEmpty = !page || !background;
 
-  const backgroundUrl = background.url || FALLBACK_IMAGE;
-  const layoutType = (background.layout_type || "CENTER").toUpperCase();
-
-  // Filtra solo i testi non vuoti
-  const texts = [page.text_1, page.text_2, page.text_3].filter((text) => text && text.trim());
+  // Filtra solo i testi non vuoti e li associa alle posizioni
+  const texts = isEmpty
+    ? []
+    : [page.text_field_1, page.text_field_2, page.text_field_3]
+        .map((text, index) => ({
+          text: text?.trim() || "",
+          position: textPositions[index] || null,
+        }))
+        .filter((item) => item.text && item.position);
 
   return (
     <div className={`page-preview ${className}`}>
       {/* Background image */}
-      <div className="page-preview-background" style={{ backgroundImage: `url(${backgroundUrl})` }} />
+      <div
+        className="page-preview-background"
+        style={{
+          backgroundImage: isEmpty ? `url(${FALLBACK_IMAGE_URL})` : `url(${backgroundUrl})`,
+          opacity: isEmpty ? 0.3 : 1,
+        }}
+      />
 
-      {/* Text overlay container con layout dinamico */}
-      <div className={`page-preview-overlay layout-${layoutType.toLowerCase()}`}>
-        {texts.map((text, index) => (
-          <div key={index} className={`text-slot text-slot-${index + 1}`}>
-            <p className="text-content">{text}</p>
-          </div>
-        ))}
+      {/* Text overlay con posizionamento assoluto basato su coordinate DB */}
+      <div className="page-preview-overlay">
+        {isEmpty ? (
+          <p className="page-preview-placeholder">Seleziona un background per visualizzare la pagina</p>
+        ) : (
+          texts.map((item, index) => {
+            const { x, y, w, h } = item.position;
+            const style = {
+              position: "absolute",
+              left: `${x * 100}%`,
+              top: `${y * 100}%`,
+              width: `${w * 100}%`,
+              height: `${h * 100}%`,
+            };
+
+            return (
+              <div key={index} className="text-slot" style={style}>
+                <p className="text-content">{item.text}</p>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );
@@ -45,13 +65,22 @@ function PagePreview({ page, background, className = "" }) {
 
 PagePreview.propTypes = {
   page: PropTypes.shape({
-    text_1: PropTypes.string,
-    text_2: PropTypes.string,
-    text_3: PropTypes.string,
+    text_field_1: PropTypes.string,
+    text_field_2: PropTypes.string,
+    text_field_3: PropTypes.string,
   }),
   background: PropTypes.shape({
     url: PropTypes.string,
-    layout_type: PropTypes.string,
+    text_positions: PropTypes.shape({
+      fields: PropTypes.arrayOf(
+        PropTypes.shape({
+          x: PropTypes.number.isRequired,
+          y: PropTypes.number.isRequired,
+          w: PropTypes.number.isRequired,
+          h: PropTypes.number.isRequired,
+        })
+      ),
+    }),
     text_fields_count: PropTypes.number,
   }),
   className: PropTypes.string,
