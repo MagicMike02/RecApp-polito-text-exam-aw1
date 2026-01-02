@@ -5,14 +5,13 @@ import PagePreview from "../components/PagePreview";
 import BackgroundSelector from "../components/BackgroundSelector";
 import PageThumbnail from "../components/PageThumbnail";
 import { Alert } from "react-bootstrap";
-import Spinner from "../components/utils/Spinner";
+import { Spinner } from "react-bootstrap";
 import "./RecapEditorPage.css";
 
 function RecapEditorPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Stato principale del riepilogo
   const [recapData, setRecapData] = useState({
     title: "",
     visibility: "private",
@@ -21,7 +20,6 @@ function RecapEditorPage() {
     pages: [],
   });
 
-  // Stato UI
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [backgrounds, setBackgrounds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,9 +27,6 @@ function RecapEditorPage() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // ============================================
-  // INIZIALIZZAZIONE
-  // ============================================
   useEffect(() => {
     const initEditor = async () => {
       const templateId = searchParams.get("template");
@@ -92,9 +87,6 @@ function RecapEditorPage() {
     initEditor();
   }, [searchParams]);
 
-  // ============================================
-  // HANDLERS - RECAP METADATA
-  // ============================================
   const updateTitle = (value) => {
     setRecapData((prev) => ({ ...prev, title: value }));
   };
@@ -103,9 +95,6 @@ function RecapEditorPage() {
     setRecapData((prev) => ({ ...prev, visibility: value }));
   };
 
-  // ============================================
-  // HANDLERS - PAGINA CORRENTE
-  // ============================================
   const updatePageText = (field, value) => {
     setRecapData((prev) => ({
       ...prev,
@@ -120,9 +109,6 @@ function RecapEditorPage() {
     }));
   };
 
-  // ============================================
-  // HANDLERS - GESTIONE PAGINE
-  // ============================================
   const addPage = () => {
     setRecapData((prev) => ({
       ...prev,
@@ -174,9 +160,6 @@ function RecapEditorPage() {
     }
   };
 
-  // ============================================
-  // VALIDAZIONI E SALVATAGGIO
-  // ============================================
   const validateRecap = () => {
     if (!recapData.title.trim()) {
       return "Inserisci un titolo per il riepilogo";
@@ -253,13 +236,10 @@ function RecapEditorPage() {
     }
   };
 
-  // ============================================
-  // RENDERING
-  // ============================================
   if (loading) {
     return (
       <div className="editor-loading">
-        <Spinner />
+        <Spinner animation="border" role="status" />
         <p>Caricamento editor...</p>
       </div>
     );

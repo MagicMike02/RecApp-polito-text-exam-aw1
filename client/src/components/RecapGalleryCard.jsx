@@ -8,7 +8,6 @@ function RecapGalleryCard({ recap, showDesc = false, showUseBtn = false, showPre
   const isDerived = Boolean(recap.derived_from_recap_id || recap.original_summary_id);
   const mainAuthor = recap.derived_from_author || "?";
 
-  // Mostra tutte le immagini delle pagine come una gallery orizzontale in alto
   const pageImages =
     recap.pages && recap.pages.length > 0
       ? recap.pages.map((page, idx) =>

@@ -31,7 +31,6 @@
   max-width: 90%;
 }
 
-/* Background image */
 .page-preview-background {
   position: absolute;
   top: 0;
@@ -43,7 +42,6 @@
   background-repeat: no-repeat;
 }
 
-/* Overlay container for absolute positioned text boxes */
 .page-preview-overlay {
   position: absolute;
   top: 0;
@@ -56,7 +54,8 @@
   justify-content: center;
 }
 
-/* Text slots with absolute positioning based on DB coordinates */
+/* Text overlay con posizionamento assoluto basato su coordinate DB */
+
 .text-slot {
   display: flex;
   align-items: center;

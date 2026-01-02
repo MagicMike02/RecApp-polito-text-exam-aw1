@@ -32,7 +32,6 @@
   --transition-medium: all 0.3s;
 }
 
-/* RESET */
 body {
   background-color: var(--bg-app);
   color: var(--text-main);
@@ -69,7 +68,6 @@ body {
   transition: color 0.2s;
 }
 
-/* Effetto Hover e Active */
 .nav-link-custom:hover,
 .nav-link-custom.active {
   color: var(--primary-color);
@@ -140,7 +138,6 @@ body {
   box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1) !important;
 }
 
-/* ---  --- */
 .btn-logout {
   background-color: var(--primary-color);
   color: white;

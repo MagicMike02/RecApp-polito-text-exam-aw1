@@ -2,14 +2,6 @@ import PropTypes from "prop-types";
 import "./PagePreview.css";
 import { FALLBACK_IMAGE_URL } from "../constants";
 
-/**
- * PagePreview - Componente per visualizzare una pagina con background e testi sovrapposti
- *
- * Utilizza le coordinate precise (text_positions) dal database per posizionare i testi.
- * Le coordinate sono espresse in percentuali: { x, y, w, h } dove:
- * - x, y: posizione top-left del box di testo (0-1)
- * - w, h: larghezza e altezza del box di testo (0-1)
- */
 function PagePreview({ page, background, className = "" }) {
   const backgroundUrl = background?.url || FALLBACK_IMAGE_URL;
   const textPositions = background?.text_positions?.fields || [];

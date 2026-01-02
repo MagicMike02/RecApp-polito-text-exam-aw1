@@ -2,12 +2,6 @@ import PropTypes from "prop-types";
 import PagePreview from "./PagePreview";
 import "./PageThumbnail.css";
 
-/**
- * PageThumbnail - Miniatura di una pagina con controlli di azione
- *
- * Mostra una preview ridotta della pagina nella sidebar dell'editor.
- * Include pulsanti per selezione, riordino (su/giù) e eliminazione.
- */
 function PageThumbnail({
   page,
   background,

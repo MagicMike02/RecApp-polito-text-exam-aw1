@@ -1,6 +1,6 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import Spinner from './utils/Spinner';
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { Spinner } from "react-bootstrap";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -9,7 +9,7 @@ function ProtectedRoute({ children }) {
   if (loading) {
     return (
       <div className="text-center mt-5">
-        <Spinner />
+        <Spinner animation="border" role="status" />
       </div>
     );
   }

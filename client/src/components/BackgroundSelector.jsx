@@ -2,12 +2,6 @@ import PropTypes from "prop-types";
 import "./BackgroundSelector.css";
 import { FALLBACK_IMAGE_URL } from "../constants";
 
-/**
- * BackgroundSelector - Grid di selezione immagini di background
- *
- * Mostra una griglia responsive di thumbnails cliccabili.
- * Evidenzia il background attualmente selezionato.
- */
 function BackgroundSelector({ backgrounds, selectedId, onSelect }) {
   if (!backgrounds || backgrounds.length === 0) {
     return (

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getRecapById, deleteRecap } from "../services/apiService";
-import Spinner from "../components/utils/Spinner";
+import { Spinner } from "react-bootstrap";
 import { Alert } from "react-bootstrap";
 import { FALLBACK_IMAGE_URL } from "../constants";
 import "./RecapViewPage.css";
@@ -41,7 +41,7 @@ function RecapViewPage() {
     }
   };
 
-  if (loading) return <Spinner />;
+  if (loading) return <div className="text-center mt-5"><Spinner animation="border" role="status" /></div>;
   if (error) return <Alert variant="danger">{error}</Alert>;
   if (!recap) return null;
 

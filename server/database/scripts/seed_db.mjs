@@ -1,9 +1,9 @@
 /**
- * Database Seeding Script - COMPLETE & CLEAN
+ * Database Seeding Script
  * * Includes all original data:
  * - 3 Users
  * - 3 Themes
- * - 36 Background Images (Specific coordinates preserved)
+ * - 36 Background Images 
  * - 6 Templates
  * - 9 Recaps (with derivation logic)
  */
