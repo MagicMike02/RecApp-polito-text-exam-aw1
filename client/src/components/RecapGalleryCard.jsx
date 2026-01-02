@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import "./RecapCard.css";
+import "./RecapGalleryCard.css";
 
 function RecapGalleryCard({ recap, showDesc = false, showUseBtn = false, showPreviewBtn = false }) {
   const theme = recap.theme_name || "-";

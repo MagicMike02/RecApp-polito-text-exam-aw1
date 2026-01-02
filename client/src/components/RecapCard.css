@@ -1,20 +1,3 @@
-.recap-card-covers-multi {
-  display: flex;
-  gap: 0;
-  justify-content: stretch;
-  padding: 0;
-  width: 100%;
-}
-.recap-card-cover-multi {
-  flex: 1 1 0;
-  aspect-ratio: 3/4;
-  background-size: cover;
-  background-position: center;
-  border-radius: 0;
-  box-shadow: none;
-  border: none;
-  min-width: 0;
-}
 .recap-card {
   background: var(--card-bg, #fff);
   border-radius: 16px;
