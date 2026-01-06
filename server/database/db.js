@@ -8,7 +8,9 @@ export async function openDatabase() {
 		driver: DATABASE.OPTIONS.verbose ? sqlite3.verbose().Database : sqlite3.Database
 	});
 
-	await db.get('PRAGMA foreign_keys = ON');
+	// Ensure foreign key constraints are enabled
+	await db.exec('PRAGMA foreign_keys = ON;');
+	console.log('PRAGMA foreign_keys set to ON'); // Debugging log
 
 	return db;
 }

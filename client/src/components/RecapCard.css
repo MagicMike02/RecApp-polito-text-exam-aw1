@@ -21,7 +21,7 @@
   width: 100%;
 }
 .recap-card-body {
-  padding: 1.2rem 1.3rem 1.3rem 1.3rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -47,7 +47,7 @@
 .recap-card-badge-visibility {
   background: var(--badge-bg-visibility, #e9e6fa);
   color: var(--badge-color-visibility, #5a3ec8);
-  
+
   border-radius: 8px;
   padding: 0.1rem 0.7rem;
   font-size: 0.85rem;

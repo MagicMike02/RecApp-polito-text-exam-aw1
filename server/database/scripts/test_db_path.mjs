@@ -1,7 +1,3 @@
-/**
- * Test script to verify database path configuration
- * Usage: node test_db_path.mjs
- */
 
 import { getDatabasePath } from '../db.js';
 import { DATABASE } from '../../config.js';

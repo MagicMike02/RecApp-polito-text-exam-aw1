@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import "./RecapViewPage.css";
 import { useParams, useNavigate } from "react-router-dom";
-import { getRecapById } from "../services/apiService";
-import Spinner from "../components/utils/Spinner";
-import Alert from "../components/utils/Alert";
+import { getRecapById, deleteRecap } from "../services/apiService";
+import { Spinner } from "react-bootstrap";
+import { Alert } from "react-bootstrap";
+import { FALLBACK_IMAGE_URL } from "../constants";
+import "./RecapViewPage.css";
 
 function RecapViewPage() {
   const navigate = useNavigate();
@@ -28,8 +29,20 @@ function RecapViewPage() {
       });
   }, [id]);
 
-  if (loading) return <Spinner />;
-  if (error) return <Alert message={error} type="error" />;
+  const handleDelete = async () => {
+    if (window.confirm("Sei sicuro di voler eliminare questo recap?")) {
+      try {
+        await deleteRecap(id);
+        alert("Recap eliminato con successo.");
+        navigate("/profile");
+      } catch (error) {
+        alert(`Errore durante l'eliminazione: ${error.message}`);
+      }
+    }
+  };
+
+  if (loading) return <div className="text-center mt-5"><Spinner animation="border" role="status" /></div>;
+  if (error) return <Alert variant="danger">{error}</Alert>;
   if (!recap) return null;
 
   const pages = recap.pages || [];
@@ -42,7 +55,11 @@ function RecapViewPage() {
           &larr; Torna indietro
         </button>
         <h2 className="recap-title">{recap.title}</h2>
+        <button className="delete-btn" onClick={handleDelete}>
+          Elimina
+        </button>
       </div>
+
       <div className="recap-info">
         <div className="recap-card-meta" style={{ justifyContent: "center" }}>
           <span className="recap-card-badge-author">di {recap.author_name}</span>
@@ -62,7 +79,7 @@ function RecapViewPage() {
       <div className="recap-slideshow">
         <div className="recap-slideshow-img-wrapper" style={{ position: "relative" }}>
           <img
-            src={page.background_image_url}
+            src={page.background_image_url || FALLBACK_IMAGE_URL}
             alt={"Pagina " + (currentPage + 1)}
             className="recap-slideshow-img"
             style={{ width: "100%", borderRadius: "16px", boxShadow: "0 4px 24px rgba(15,118,110,0.10)" }}

@@ -38,3 +38,30 @@
     transform: rotate(360deg);
   }
 }
+
+@media (max-width: 400px) {
+  .recap-list-grid {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    padding: 0 0.2rem;
+  }
+  .recap-card {
+    min-width: 0;
+    font-size: 0.92rem;
+    box-shadow: none;
+  }
+}
+@media (max-width: 900px) {
+  .recap-list-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem;
+    padding: 0 1rem;
+  }
+}
+@media (max-width: 600px) {
+  .recap-list-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+    padding: 0 0.5rem;
+  }
+}

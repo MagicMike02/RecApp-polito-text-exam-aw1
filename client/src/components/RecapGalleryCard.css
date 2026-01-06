@@ -1,0 +1,45 @@
+.recap-card-covers-multi {
+  display: flex;
+  gap: 0;
+  justify-content: stretch;
+  padding: 0;
+  width: 100%;
+}
+.recap-card-cover-multi {
+  flex: 1 1 0;
+  aspect-ratio: 3/4;
+  background-size: cover;
+  background-position: center;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  min-width: 0;
+}
+.crp-desc {
+  font-size: 1rem;
+  color: var(--text-main);
+  margin: 0.5rem 0;
+}
+.crp-btn-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.crp-btn {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(15, 118, 110, 0.1);
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-block;
+}
+.crp-btn:hover {
+  background: var(--primary-hover);
+}

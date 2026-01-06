@@ -32,7 +32,6 @@
   --transition-medium: all 0.3s;
 }
 
-/* RESET */
 body {
   background-color: var(--bg-app);
   color: var(--text-main);
@@ -41,56 +40,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* --- NAVBAR STYLES --- */
-.navbar-custom {
-  background-color: #ffffff;
-  height: var(--navbar-height);
-  border-bottom: 1px solid #e2e8f0;
-  padding: 0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-
-.brand-text {
-  color: var(--primary-color);
-  font-weight: 800;
-  font-size: 1.5rem;
-  letter-spacing: -0.5px;
-  text-decoration: none;
-}
-
-.nav-link-custom {
-  color: var(--text-muted);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0.5rem 0;
-  margin-right: 2rem;
-  position: relative;
-  transition: color 0.2s;
-}
-
-/* Effetto Hover e Active */
-.nav-link-custom:hover,
-.nav-link-custom.active {
-  color: var(--primary-color);
-}
-
-/* Riga animata sotto al link attiva */
-.nav-link-custom::after {
-  content: "";
-  position: absolute;
-  width: 0;
-  height: 2px;
-  bottom: 0;
-  left: 0;
-  background-color: var(--primary-color);
-  transition: width 0.3s ease;
-}
-.nav-link-custom.active::after {
-  width: 100%;
-}
-
-/* --- BUTTONS: GENERAL STYLES --- */
 .btn {
   border-radius: 10px;
   font-weight: 600;
@@ -121,7 +70,6 @@ body {
   opacity: 0.7;
 }
 
-/* --- OUTLINE BUTTON --- */
 .btn-outline-nav {
   color: var(--text-muted);
   border: 1px solid #cbd5e1;
@@ -140,7 +88,6 @@ body {
   box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1) !important;
 }
 
-/* ---  --- */
 .btn-logout {
   background-color: var(--primary-color);
   color: white;
@@ -164,7 +111,6 @@ body {
   box-shadow: none !important;
 }
 
-/* --- FORM CONTROLS --- */
 .form-control {
   background-color: #ffffff;
   border: 1px solid #cbd5e1;
@@ -180,14 +126,12 @@ body {
   box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.15);
 }
 
-/* --- FIX FOR LOADING STATE BUTTON --- */
 .btn-primary-custom[disabled] {
   background-color: var(--primary-color) !important;
   color: white !important;
   opacity: 0.7;
 }
 
-/* --- UTILS --- */
 .password-wrapper {
   position: relative;
 }
@@ -217,9 +161,7 @@ body {
   padding-right: 1.5rem;
   max-width: 450px;
 }
-.text-primary-custom {
-  color: var(--primary-color);
-}
+
 .form-label-custom {
   font-weight: 700;
   font-size: 0.75rem;
@@ -228,4 +170,19 @@ body {
   margin-bottom: 0.5rem;
   display: block;
   text-transform: uppercase;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 2rem 0 2rem;
+  min-height: 80px;
+}
+
+.page-title {
+  color: var(--primary-color);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
 }
