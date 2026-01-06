@@ -55,7 +55,6 @@
 }
 
 /* Text overlay con posizionamento assoluto basato su coordinate DB */
-
 .text-slot {
   display: flex;
   align-items: center;

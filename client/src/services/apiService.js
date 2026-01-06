@@ -1,32 +1,30 @@
 import axios from 'axios';
+import { API_URL } from '../constants';
 
-const API_URL = 'http://localhost:3001';
-
-// Create an Axios instance
+// Axios instance
 const apiClient = axios.create({
 	baseURL: API_URL,
 	headers: {
 		'Content-Type': 'application/json',
 	},
-	withCredentials: true, // Include cookies for session-based auth
+	withCredentials: true, 
 });
 
-// Add a response interceptor
+//response interceptor
 apiClient.interceptors.response.use(
-	(response) => response.data, // Automatically return the data from the response
+	(response) => response.data, 
 	(error) => {
 		if (error.response) {
-			// Handle HTTP errors
 			const errorData = error.response.data;
 			const errorMessage = errorData?.message || errorData?.error || 'API call failed';
 			const errorDetails = errorData?.errors ? JSON.stringify(errorData.errors, null, 2) : null;
-			
+
 			console.error(`[API ERROR ${error.response.status}]`, {
 				message: errorMessage,
 				details: errorDetails,
 				fullResponse: errorData,
 			});
-			
+
 			const fullError = errorDetails ? `${errorMessage}\n\nDettagli:\n${errorDetails}` : errorMessage;
 			return Promise.reject(new Error(fullError));
 		}
@@ -35,12 +33,11 @@ apiClient.interceptors.response.use(
 	}
 );
 
-// Generic function to handle API calls
 async function apiCall(endpoint, options = {}) {
 	const { method = 'GET', data, params, headers } = options;
 
 	try {
-		console.log(`[API] ${method} ${endpoint}`, data || params); // Log della richiesta
+		console.log(`[API] ${method} ${endpoint}`, data || params); 
 		const result = await apiClient.request({
 			url: endpoint,
 			method,
@@ -48,7 +45,7 @@ async function apiCall(endpoint, options = {}) {
 			params,
 			headers,
 		});
-		console.log(`[API SUCCESS] ${method} ${endpoint}`, result); // Log della risposta
+		console.log(`[API SUCCESS] ${method} ${endpoint}`, result);
 		return result;
 	} catch (error) {
 		console.error(`[API EXCEPTION] ${method} ${endpoint}:`, error.message);

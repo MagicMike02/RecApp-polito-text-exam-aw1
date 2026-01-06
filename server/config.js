@@ -12,7 +12,7 @@ export const DATABASE = {
 	FILENAME: 'database.sqlite',
 
 	OPTIONS: {
-		verbose: true, 
+		verbose: true,
 	}
 };
 
@@ -23,7 +23,7 @@ export const SERVER = {
 	API_PREFIX: '/api',
 
 	CORS: {
-		origin: 'http://localhost:5173', 
+		origin: 'http://localhost:5173',
 		credentials: true,
 	}
 };
@@ -36,9 +36,8 @@ export const SESSION = {
 
 	COOKIE: {
 		httpOnly: true,
-		secure: false, // Set to true with HTTPS
+		secure: false, // false per sviluppo in locale http
 		maxAge: 1000 * 60 * 60 * 24, // 24 hours
-		sameSite: 'lax', //used for CSRF protection
 	},
 
 	OPTIONS: {
@@ -67,7 +66,7 @@ export const CONSTRAINTS = {
 	IMAGE: {
 		TEXT_FIELDS_OPTIONS: [1, 2, 3],
 		MIN_IMAGES_PER_THEME: 12,
-		IMAGES_PER_FIELD_COUNT: 4, 
+		IMAGES_PER_FIELD_COUNT: 4,
 	},
 
 	THEME: {

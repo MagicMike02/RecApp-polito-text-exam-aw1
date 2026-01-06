@@ -17,7 +17,6 @@ import recapRoutes from './routes/recapRoutes.js';
 
 const app = express();
 
-// Logging middleware - registra tutte le richieste
 app.use(loggerMiddleware);
 
 app.use(requestLogger);
@@ -29,12 +28,12 @@ app.use(cors({
 
 app.use(session({
 	secret: SESSION.SECRET,
-	resave: false,
-	saveUninitialized: false,
+	resave: SESSION.OPTIONS.resave,
+	saveUninitialized: SESSION.OPTIONS.saveUninitialized,
 	cookie: {
-		httpOnly: true,
-		secure: false,
-		maxAge: SESSION.OPTIONS.maxAge
+		httpOnly: SESSION.COOKIE.httpOnly,
+		secure: SESSION.COOKIE.secure,
+		maxAge: SESSION.COOKIE.maxAge
 	}
 }));
 
@@ -81,10 +80,10 @@ app.get('/api/test', (req, res) => {
 	res.json({ message: 'Server funzionante!' });
 });
 
+app.use(errorLoggerMiddleware); 
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Start server only if not in test environment
 if (process.env.NODE_ENV !== 'test') {
 	app.listen(SERVER.PORT, () => {
 		logger.info(`Server running on http://localhost:${SERVER.PORT}`);
