@@ -4,7 +4,8 @@ import { getTemplateById, getRecapById, getImagesByTheme, createRecap } from "..
 import PagePreview from "../components/PagePreview";
 import BackgroundSelector from "../components/BackgroundSelector";
 import PageThumbnail from "../components/PageThumbnail";
-import { Alert } from "react-bootstrap";
+import ResultModal from "../components/ResultModal";
+import Toast from "../components/Toast";
 import { Spinner } from "react-bootstrap";
 import "./RecapEditorPage.css";
 
@@ -25,7 +26,40 @@ function RecapEditorPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
+  const [deletePageIndex, setDeletePageIndex] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Modale
+  const [modal, setModal] = useState({
+    show: false,
+    type: null,
+    title: null,
+    message: null,
+  });
+
+  // Toast
+  const [toast, setToast] = useState({
+    show: false,
+    type: null,
+    title: null,
+    message: null,
+  });
+
+  const showModal = (type, title, message) => {
+    setModal({ show: true, type, title, message });
+  };
+
+  const hideModal = () => {
+    setModal({ show: false, type: null, title: null, message: null });
+  };
+
+  const showToast = (type, title, message) => {
+    setToast({ show: true, type, title, message });
+  };
+
+  const hideToast = () => {
+    setToast({ show: false, type: null, title: null, message: null });
+  };
 
   useEffect(() => {
     const initEditor = async () => {
@@ -129,19 +163,39 @@ function RecapEditorPage() {
 
   const deletePage = (index) => {
     if (recapData.pages.length <= 3) {
-      setError("Servono almeno 3 pagine per creare un riepilogo!");
+      showToast("error", "Errore", "Servono almeno 3 pagine per creare un riepilogo!");
       return;
     }
 
-    const newPages = recapData.pages.filter((_, i) => i !== index);
-    setRecapData((prev) => ({ ...prev, pages: newPages }));
+    setDeletePageIndex(index);
+    showModal(
+      "confirm",
+      "Elimina Pagina?",
+      `Sei sicuro di voler eliminare la pagina ${index + 1}? Questa azione non può essere annullata.`
+    );
+  };
 
-    // Aggiusta l'indice corrente se necessario
-    if (currentPageIndex >= newPages.length) {
-      setCurrentPageIndex(newPages.length - 1);
-    } else if (currentPageIndex === index && index > 0) {
-      setCurrentPageIndex(index - 1);
-    }
+  const confirmDeletePage = () => {
+    if (deletePageIndex === null) return;
+
+    setIsDeleting(true);
+    setTimeout(() => {
+      const newPages = recapData.pages.filter((_, i) => i !== deletePageIndex);
+      setRecapData((prev) => ({ ...prev, pages: newPages }));
+
+      // Aggiusta l'indice corrente se necessario
+      if (currentPageIndex >= newPages.length) {
+        setCurrentPageIndex(newPages.length - 1);
+      } else if (currentPageIndex === deletePageIndex && deletePageIndex > 0) {
+        setCurrentPageIndex(deletePageIndex - 1);
+      }
+
+      hideModal();
+      setIsDeleting(false);
+      setDeletePageIndex(null);
+
+      showToast("success", "Fatto", "Pagina eliminata con successo");
+    }, 300);
   };
 
   const movePage = (fromIndex, direction) => {
@@ -192,15 +246,12 @@ function RecapEditorPage() {
     // Validazioni
     const validationError = validateRecap();
     if (validationError) {
-      setError(validationError);
-      setSuccess(null);
+      showToast("error", "Errore di validazione", validationError);
       return;
     }
 
     try {
       setSaving(true);
-      setError(null);
-      setSuccess(null);
 
       // Prepara i dati per l'API
       const payload = {
@@ -210,11 +261,11 @@ function RecapEditorPage() {
 
       await createRecap(payload);
 
-      // Mostra successo prima di navigare
-      setSuccess("✓ Recap creato con successo!");
+      showModal("success", "Successo!", "Recap creato con successo!");
+
       setTimeout(() => {
         navigate("/profile");
-      }, 1500);
+      }, 2000);
     } catch (err) {
       // Cerca di estrarre messaggio di errore dall'API
       let errorMsg = "Errore durante il salvataggio";
@@ -229,8 +280,7 @@ function RecapEditorPage() {
         errorMsg = err.message;
       }
 
-      setError(errorMsg);
-      setSuccess(null);
+      showModal("error", "Errore", errorMsg);
     } finally {
       setSaving(false);
     }
@@ -248,10 +298,13 @@ function RecapEditorPage() {
   if (error && !recapData.theme_id) {
     return (
       <div className="editor-error">
-        <Alert variant="danger">{error}</Alert>
-        <button className="btn btn-primary-custom" onClick={() => navigate("/create")}>
-          Torna alla creazione
-        </button>
+        <div style={{ padding: "2rem", textAlign: "center" }}>
+          <h2 style={{ color: "#e74c3c", marginBottom: "1rem" }}>Errore</h2>
+          <p style={{ marginBottom: "1.5rem" }}>{error}</p>
+          <button className="btn btn-primary-custom" onClick={() => navigate("/create")}>
+            Torna alla creazione
+          </button>
+        </div>
       </div>
     );
   }
@@ -312,9 +365,6 @@ function RecapEditorPage() {
         </div>
 
         <div className="editor-controls-content">
-          {success && <Alert variant="success">{success}</Alert>}
-          {error && <Alert variant="danger">{error}</Alert>}
-
           {/* Titolo e Visibilità */}
           <div className="editor-section">
             <div className="form-group">
@@ -387,7 +437,9 @@ function RecapEditorPage() {
                 )}
               </>
             ) : (
-              <Alert type="info">Seleziona un background per aggiungere testi</Alert>
+              <div style={{ padding: "1rem", textAlign: "center", color: "var(--text-muted)" }}>
+                Seleziona un background per aggiungere testi
+              </div>
             )}
           </div>
 
@@ -418,6 +470,22 @@ function RecapEditorPage() {
           </button>
         </div>
       </aside>
+
+      {/* Result Modal */}
+      <ResultModal
+        show={modal.show}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        onClose={hideModal}
+        onConfirm={confirmDeletePage}
+        confirmText="Elimina"
+        cancelText="Annulla"
+        isLoading={isDeleting}
+      />
+
+      {/* Toast */}
+      <Toast show={toast.show} type={toast.type} title={toast.title} message={toast.message} onClose={hideToast} />
     </div>
   );
 }

@@ -238,14 +238,6 @@ textarea.form-control {
   padding: 0.75rem 1.2rem;
 }
 
-.w-100 {
-  width: 100%;
-}
-
-.mb-2 {
-  margin-bottom: 0.5rem;
-}
-
 @media (max-width: 1400px) {
   .editor-container {
     grid-template-columns: 260px 1fr 360px;
@@ -394,25 +386,5 @@ textarea.form-control {
   .editor-preview-info {
     font-size: 0.75rem;
     padding: 0.4rem 1rem;
-  }
-}
-
-@media (max-width: 992px) {
-  .editor-sidebar-content::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  .editor-sidebar-content::-webkit-scrollbar-track {
-    background: var(--bg-app);
-    border-radius: 3px;
-  }
-
-  .editor-sidebar-content::-webkit-scrollbar-thumb {
-    background: var(--text-muted);
-    border-radius: 3px;
-  }
-
-  .editor-sidebar-content::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-color);
   }
 }
