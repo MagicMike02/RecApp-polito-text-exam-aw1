@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Tabs, Tab, Alert, Spinner } from "react-bootstrap";
+import { Tabs, Tab, Spinner, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import {
   getThemes,
@@ -8,11 +8,13 @@ import {
   getImagesByTheme,
   getTemplateById,
 } from "../services/apiService";
+import { useNotification } from "../contexts/NotificationContext";
 import RecapGalleryCard from "../components/RecapGalleryCard";
 import "./CreateRecapPage.css";
 
 function CreateRecapPage() {
   const navigate = useNavigate();
+  const { showError } = useNotification();
   const [activeTab, setActiveTab] = useState("templates");
 
   const [themes, setThemes] = useState([]);
@@ -22,13 +24,11 @@ function CreateRecapPage() {
 
   const [publicRecaps, setPublicRecaps] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        setError(null);
 
         const themesResult = await getThemes();
         setThemes(themesResult);
@@ -40,13 +40,14 @@ function CreateRecapPage() {
         const recapsResult = await getPublicRecaps();
         setPublicRecaps(recapsResult);
       } catch (err) {
-        setError(err.message || "Error loading data");
+        const errorMsg = err.message || "Error loading data";
+        showError("Errore", errorMsg);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [showError]);
 
   useEffect(() => {
     const fetchTemplatesAndBackgrounds = async () => {
@@ -62,11 +63,12 @@ function CreateRecapPage() {
         setTemplates(templatesFull);
         setThemeBackgrounds(themeBackgroundsResult);
       } catch (err) {
-        setError(err.message || "Error loading templates or backgrounds");
+        const errorMsg = err.message || "Error loading templates or backgrounds";
+        showError("Errore", errorMsg);
       }
     };
     fetchTemplatesAndBackgrounds();
-  }, [selectedTheme]);
+  }, [selectedTheme, showError]);
 
   const handleCreateFromTemplate = (templateId) => {
     navigate(`/editor/new?template=${templateId}`);
@@ -83,17 +85,6 @@ function CreateRecapPage() {
           <span className="visually-hidden">Loading...</span>
         </Spinner>
         <p className="mt-3">Loading options...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="crp-create-recap-container">
-        <Alert variant="danger">
-          <Alert.Heading>Error</Alert.Heading>
-          <p>{error}</p>
-        </Alert>
       </div>
     );
   }

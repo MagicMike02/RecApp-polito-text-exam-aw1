@@ -2,18 +2,11 @@ import PropTypes from "prop-types";
 import "./RecapList.css";
 import RecapCard from "./RecapCard";
 
-function RecapList({ recaps, loading, error }) {
+function RecapList({ recaps, loading }) {
   if (loading) {
     return (
       <div className="recap-list-center">
         <div className="recap-list-spinner" />
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div className="recap-list-center">
-        <span className="recap-list-error">{error}</span>
       </div>
     );
   }

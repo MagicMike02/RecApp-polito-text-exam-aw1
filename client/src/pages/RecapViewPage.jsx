@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getRecapById, deleteRecap } from "../services/apiService";
 import { Spinner } from "react-bootstrap";
-import { Alert } from "react-bootstrap";
 import { FALLBACK_IMAGE_URL } from "../constants";
+import { useNotification } from "../contexts/NotificationContext";
 import "./RecapViewPage.css";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -12,15 +12,14 @@ function RecapViewPage() {
   const { id } = useParams();
   const [recap, setRecap] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const { isAuthenticated, user } = useAuth();
+  const { showError, showSuccess, confirmAction } = useNotification();
 
   const currentUser = isAuthenticated ? user.id : null;
 
   useEffect(() => {
     setLoading(true);
-    setError("");
     getRecapById(id)
       .then((data) => {
         setRecap(data);
@@ -28,21 +27,26 @@ function RecapViewPage() {
         setCurrentPage(0);
       })
       .catch((err) => {
-        setError(err.message || "Errore nel caricamento del recap.");
+        const errorMsg = err.message || "Errore nel caricamento del recap.";
+        showError("Errore", errorMsg);
         setLoading(false);
       });
-  }, [id]);
+  }, [id, showError]);
 
   const handleDelete = async () => {
-    if (window.confirm("Sei sicuro di voler eliminare questo recap?")) {
-      try {
-        await deleteRecap(id);
-        alert("Recap eliminato con successo.");
-        navigate("/profile");
-      } catch (error) {
-        alert(`Errore durante l'eliminazione: ${error.message}`);
+    await confirmAction(
+      "Elimina recap",
+      "Sei sicuro di voler eliminare questo recap?",
+      async () => {
+        try {
+          await deleteRecap(id);
+          showSuccess("Recap eliminato", "Il recap è stato eliminato con successo.");
+          navigate("/profile");
+        } catch (error) {
+          showError("Errore", `Errore durante l'eliminazione: ${error.message}`);
+        }
       }
-    }
+    );
   };
 
   if (loading)
@@ -51,7 +55,6 @@ function RecapViewPage() {
         <Spinner animation="border" role="status" />
       </div>
     );
-  if (error) return <Alert variant="danger">{error}</Alert>;
   if (!recap) return null;
 
   const pages = recap.pages || [];

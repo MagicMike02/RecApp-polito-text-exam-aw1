@@ -1,8 +1,9 @@
-import { useState, useActionState } from "react";
+import { useState, useActionState, useEffect } from "react";
 import "./LoginPage.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Container, Card, Form, Button, Alert } from "react-bootstrap";
+import { useNotification } from "../contexts/NotificationContext";
+import { Container, Card, Form, Button } from "react-bootstrap";
 import { Eye, EyeSlash } from "react-bootstrap-icons";
 
 function LoginPage() {
@@ -10,6 +11,7 @@ function LoginPage() {
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { showError } = useNotification();
 
   const loginAction = async (prevState, formData) => {
     const username = formData.get("username");
@@ -34,6 +36,12 @@ function LoginPage() {
 
   const [state, formAction, isPending] = useActionState(loginAction, { error: null });
 
+  useEffect(() => {
+    if (state?.error) {
+      showError("Errore di login", state.error);
+    }
+  }, [state?.error, showError]);
+
   return (
     <Container fluid className="login-container">
       <Card className="login-card">
@@ -41,8 +49,6 @@ function LoginPage() {
           <div className="login-header">
             <h2 className="login-title">RecapApp</h2>
           </div>
-
-          {state?.error && <Alert variant="danger">{state.error}</Alert>}
 
           <Form action={formAction} className="login-form">
             <div className="login-group">

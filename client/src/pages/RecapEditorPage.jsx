@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getTemplateById, getRecapById, getImagesByTheme, createRecap } from "../services/apiService";
+import { useNotification } from "../contexts/NotificationContext";
 import PagePreview from "../components/PagePreview";
 import BackgroundSelector from "../components/BackgroundSelector";
 import PageThumbnail from "../components/PageThumbnail";
-import ResultModal from "../components/ResultModal";
-import Toast from "../components/Toast";
 import { Spinner } from "react-bootstrap";
 import "./RecapEditorPage.css";
 
 function RecapEditorPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { showModal, hideModal, showToast, hideToast, showError, showSuccess, confirmAction } = useNotification();
 
   const [recapData, setRecapData] = useState({
     title: "",
@@ -24,42 +24,10 @@ function RecapEditorPage() {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [backgrounds, setBackgrounds] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [saving, setSaving] = useState(false);
   const [deletePageIndex, setDeletePageIndex] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  // Modale
-  const [modal, setModal] = useState({
-    show: false,
-    type: null,
-    title: null,
-    message: null,
-  });
-
-  // Toast
-  const [toast, setToast] = useState({
-    show: false,
-    type: null,
-    title: null,
-    message: null,
-  });
-
-  const showModal = (type, title, message) => {
-    setModal({ show: true, type, title, message });
-  };
-
-  const hideModal = () => {
-    setModal({ show: false, type: null, title: null, message: null });
-  };
-
-  const showToast = (type, title, message) => {
-    setToast({ show: true, type, title, message });
-  };
-
-  const hideToast = () => {
-    setToast({ show: false, type: null, title: null, message: null });
-  };
 
   useEffect(() => {
     const initEditor = async () => {
@@ -68,7 +36,6 @@ function RecapEditorPage() {
 
       try {
         setLoading(true);
-        setError(null);
 
         if (templateId) {
           // Carica da template
@@ -109,17 +76,21 @@ function RecapEditorPage() {
           });
           setBackgrounds(bgImages);
         } else {
-          setError("Parametri non validi. Usa ?template=ID o ?clone=ID");
+          const errorMsg = "Parametri non validi. Usa ?template=ID o ?clone=ID";
+          setError(errorMsg);
+          showError("Errore", errorMsg);
         }
       } catch (err) {
-        setError(err.message || "Errore durante il caricamento");
+        const errorMsg = err.message || "Errore durante il caricamento";
+        setError(errorMsg);
+        showError("Errore", errorMsg);
       } finally {
         setLoading(false);
       }
     };
 
     initEditor();
-  }, [searchParams]);
+  }, [searchParams, showError]);
 
   const updateTitle = (value) => {
     setRecapData((prev) => ({ ...prev, title: value }));
@@ -171,31 +142,28 @@ function RecapEditorPage() {
     showModal(
       "confirm",
       "Elimina Pagina?",
-      `Sei sicuro di voler eliminare la pagina ${index + 1}? Questa azione non può essere annullata.`
-    );
-  };
+      `Sei sicuro di voler eliminare la pagina ${index + 1}? Questa azione non può essere annullata.`,
+      async () => {
+        setIsDeleting(true);
+        setTimeout(() => {
+          const newPages = recapData.pages.filter((_, i) => i !== index);
+          setRecapData((prev) => ({ ...prev, pages: newPages }));
 
-  const confirmDeletePage = () => {
-    if (deletePageIndex === null) return;
+          // Aggiusta l'indice corrente se necessario
+          if (currentPageIndex >= newPages.length) {
+            setCurrentPageIndex(newPages.length - 1);
+          } else if (currentPageIndex === index && index > 0) {
+            setCurrentPageIndex(index - 1);
+          }
 
-    setIsDeleting(true);
-    setTimeout(() => {
-      const newPages = recapData.pages.filter((_, i) => i !== deletePageIndex);
-      setRecapData((prev) => ({ ...prev, pages: newPages }));
+          hideModal();
+          setIsDeleting(false);
+          setDeletePageIndex(null);
 
-      // Aggiusta l'indice corrente se necessario
-      if (currentPageIndex >= newPages.length) {
-        setCurrentPageIndex(newPages.length - 1);
-      } else if (currentPageIndex === deletePageIndex && deletePageIndex > 0) {
-        setCurrentPageIndex(deletePageIndex - 1);
+          showToast("success", "Fatto", "Pagina eliminata con successo");
+        }, 300);
       }
-
-      hideModal();
-      setIsDeleting(false);
-      setDeletePageIndex(null);
-
-      showToast("success", "Fatto", "Pagina eliminata con successo");
-    }, 300);
+    );
   };
 
   const movePage = (fromIndex, direction) => {
@@ -261,7 +229,7 @@ function RecapEditorPage() {
 
       await createRecap(payload);
 
-      showModal("success", "Successo!", "Recap creato con successo!");
+      showSuccess("Successo!", "Recap creato con successo!");
 
       setTimeout(() => {
         navigate("/profile");
@@ -280,7 +248,7 @@ function RecapEditorPage() {
         errorMsg = err.message;
       }
 
-      showModal("error", "Errore", errorMsg);
+      showError("Errore", errorMsg);
     } finally {
       setSaving(false);
     }
@@ -470,22 +438,6 @@ function RecapEditorPage() {
           </button>
         </div>
       </aside>
-
-      {/* Result Modal */}
-      <ResultModal
-        show={modal.show}
-        type={modal.type}
-        title={modal.title}
-        message={modal.message}
-        onClose={hideModal}
-        onConfirm={confirmDeletePage}
-        confirmText="Elimina"
-        cancelText="Annulla"
-        isLoading={isDeleting}
-      />
-
-      {/* Toast */}
-      <Toast show={toast.show} type={toast.type} title={toast.title} message={toast.message} onClose={hideToast} />
     </div>
   );
 }

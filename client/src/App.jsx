@@ -1,5 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
+import NotificationManager from "./components/NotificationManager";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
@@ -11,9 +13,10 @@ import RecapEditorPage from "./pages/RecapEditorPage";
 
 function App() {
   return (
-    <AuthProvider>
-      <Navbar />
-      <Routes>
+    <NotificationProvider>
+      <AuthProvider>
+        <Navbar />
+        <Routes>
         {/* Public routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -53,7 +56,9 @@ function App() {
           }
         />
       </Routes>
+      <NotificationManager />
     </AuthProvider>
+    </NotificationProvider>
   );
 }
 
