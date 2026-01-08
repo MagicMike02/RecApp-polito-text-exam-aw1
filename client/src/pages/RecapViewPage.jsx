@@ -5,6 +5,7 @@ import { Spinner } from "react-bootstrap";
 import { Alert } from "react-bootstrap";
 import { FALLBACK_IMAGE_URL } from "../constants";
 import "./RecapViewPage.css";
+import { useAuth } from "../contexts/AuthContext";
 
 function RecapViewPage() {
   const navigate = useNavigate();
@@ -13,6 +14,9 @@ function RecapViewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
+  const { isAuthenticated, user } = useAuth();
+
+  const currentUser = isAuthenticated ? user.id : null;
 
   useEffect(() => {
     setLoading(true);
@@ -41,7 +45,12 @@ function RecapViewPage() {
     }
   };
 
-  if (loading) return <div className="text-center mt-5"><Spinner animation="border" role="status" /></div>;
+  if (loading)
+    return (
+      <div className="text-center mt-5">
+        <Spinner animation="border" role="status" />
+      </div>
+    );
   if (error) return <Alert variant="danger">{error}</Alert>;
   if (!recap) return null;
 
@@ -55,7 +64,11 @@ function RecapViewPage() {
           &larr; Torna indietro
         </button>
         <h2 className="recap-title">{recap.title}</h2>
-        <button className="delete-btn" onClick={handleDelete}>
+        <button
+          className="delete-btn"
+          onClick={handleDelete}
+          style={{ visibility: recap.user_id === currentUser ? "visible" : "hidden" }}
+        >
           Elimina
         </button>
       </div>
