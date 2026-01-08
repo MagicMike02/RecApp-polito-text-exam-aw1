@@ -76,7 +76,7 @@ function ResultModal({
           <p className="result-modal-message">{message}</p>
         </div>
       </Modal.Body>
-      <Modal.Footer className="result-modal-footer">
+      <Modal.Footer className={`result-modal-footer ${type === "error" ? "result-modal-footer-error" : ""}`}>
         {isConfirmMode ? (
           <>
             <Button className="result-modal-btn result-modal-btn-cancel" onClick={onClose} disabled={isLoading}>
