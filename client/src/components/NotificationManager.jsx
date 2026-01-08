@@ -3,17 +3,17 @@ import Toast from "./Toast";
 import ResultModal from "./ResultModal";
 
 export const NotificationManager = () => {
-  const { toast, hideToast, modal, hideModal, isLoading, setIsLoading } = useNotification();
+  const { toast, hideToast, modal, hideModal, isLoading, startLoading, stopLoading } = useNotification();
 
   const handleModalConfirm = async () => {
     if (modal.onConfirm) {
-      setIsLoading(true);
+      startLoading();
       try {
         await modal.onConfirm();
       } catch (error) {
         console.error("Errore nella conferma:", error);
       } finally {
-        setIsLoading(false);
+        stopLoading();
         hideModal();
       }
     }

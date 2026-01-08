@@ -58,6 +58,14 @@ export const NotificationProvider = ({ children }) => {
     setModal({ show: true, type: "confirm", title, message, onConfirm });
   }, []);
 
+  const startLoading = useCallback(() => {
+    setIsLoading(true);
+  }, []);
+
+  const stopLoading = useCallback(() => {
+    setIsLoading(false);
+  }, []);
+
   const value = useMemo(
     () => ({
       // Toast
@@ -78,6 +86,8 @@ export const NotificationProvider = ({ children }) => {
       // Loading state
       isLoading,
       setIsLoading,
+      startLoading,
+      stopLoading,
     }),
     [
       toast,
@@ -92,6 +102,8 @@ export const NotificationProvider = ({ children }) => {
       hideModal,
       confirmAction,
       isLoading,
+      startLoading,
+      stopLoading,
     ]
   );
 
