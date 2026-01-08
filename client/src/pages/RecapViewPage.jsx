@@ -31,22 +31,18 @@ function RecapViewPage() {
         showError("Errore", errorMsg);
         setLoading(false);
       });
-  }, [id, showError]);
+  }, [id, showError, confirmAction]);
 
   const handleDelete = async () => {
-    await confirmAction(
-      "Elimina recap",
-      "Sei sicuro di voler eliminare questo recap?",
-      async () => {
-        try {
-          await deleteRecap(id);
-          showSuccess("Recap eliminato", "Il recap è stato eliminato con successo.");
-          navigate("/profile");
-        } catch (error) {
-          showError("Errore", `Errore durante l'eliminazione: ${error.message}`);
-        }
+    await confirmAction("Elimina recap", "Sei sicuro di voler eliminare questo recap?", async () => {
+      try {
+        await deleteRecap(id);
+        showSuccess("Recap eliminato", "Il recap è stato eliminato con successo.");
+        navigate("/profile");
+      } catch (error) {
+        showError("Errore", `Errore durante l'eliminazione: ${error.message}`);
       }
-    );
+    });
   };
 
   if (loading)

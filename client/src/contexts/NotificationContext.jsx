@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
 
 const NotificationContext = createContext();
 
@@ -21,63 +21,79 @@ export const NotificationProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Toast methods
-  const showToast = (type, title, message) => {
+  const showToast = useCallback((type, title, message) => {
     setToast({ show: true, type, title, message });
-  };
+  }, []);
 
-  const hideToast = () => {
+  const hideToast = useCallback(() => {
     setToast({ show: false, type: null, title: null, message: null });
-  };
+  }, []);
 
   // Modal methods
-  const showModal = (type, title, message, onConfirm = null) => {
+  const showModal = useCallback((type, title, message, onConfirm = null) => {
     setModal({ show: true, type, title, message, onConfirm });
-  };
+  }, []);
 
-  const hideModal = () => {
+  const hideModal = useCallback(() => {
     setModal({ show: false, type: null, title: null, message: null, onConfirm: null });
-  };
+  }, []);
 
-  const showError = (title, message) => {
-    showToast("error", title, message);
-  };
+  const showError = useCallback((title, message) => {
+    setToast({ show: true, type: "error", title, message });
+  }, []);
 
-  const showSuccess = (title, message) => {
-    showToast("success", title, message);
-  };
+  const showSuccess = useCallback((title, message) => {
+    setToast({ show: true, type: "success", title, message });
+  }, []);
 
-  const showWarning = (title, message) => {
-    showToast("warning", title, message);
-  };
+  const showWarning = useCallback((title, message) => {
+    setToast({ show: true, type: "warning", title, message });
+  }, []);
 
-  const showInfo = (title, message) => {
-    showToast("info", title, message);
-  };
+  const showInfo = useCallback((title, message) => {
+    setToast({ show: true, type: "info", title, message });
+  }, []);
 
-  const confirmAction = (title, message, onConfirm) => {
-    showModal("confirm", title, message, onConfirm);
-  };
+  const confirmAction = useCallback((title, message, onConfirm) => {
+    setModal({ show: true, type: "confirm", title, message, onConfirm });
+  }, []);
 
-  const value = {
-    // Toast
-    toast,
-    showToast,
-    hideToast,
-    showError,
-    showSuccess,
-    showWarning,
-    showInfo,
+  const value = useMemo(
+    () => ({
+      // Toast
+      toast,
+      showToast,
+      hideToast,
+      showError,
+      showSuccess,
+      showWarning,
+      showInfo,
 
-    // Modal
-    modal,
-    showModal,
-    hideModal,
-    confirmAction,
+      // Modal
+      modal,
+      showModal,
+      hideModal,
+      confirmAction,
 
-    // Loading state
-    isLoading,
-    setIsLoading,
-  };
+      // Loading state
+      isLoading,
+      setIsLoading,
+    }),
+    [
+      toast,
+      showToast,
+      hideToast,
+      showError,
+      showSuccess,
+      showWarning,
+      showInfo,
+      modal,
+      showModal,
+      hideModal,
+      confirmAction,
+      isLoading,
+    ]
+  );
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 };
