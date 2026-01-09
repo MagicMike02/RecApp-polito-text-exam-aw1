@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import PagePreview from "./PagePreview";
 import "./PageThumbnail.css";
+import { useTranslation } from "react-i18next";
 
 function PageThumbnail({
   page,
@@ -14,11 +15,12 @@ function PageThumbnail({
   canMoveUp,
   canMoveDown,
 }) {
+  const { t } = useTranslation();
   return (
     <div className={`page-thumbnail ${isActive ? "active" : ""}`}>
       {/* Header con numero pagina e azioni */}
       <div className="page-thumbnail-header">
-        <span className="page-thumbnail-number">Pagina {index + 1}</span>
+        <span className="page-thumbnail-number">{t("ui.page", { count: index + 1 })}</span>
         <div className="page-thumbnail-actions">
           {/* Riordina su */}
           <button
@@ -28,8 +30,8 @@ function PageThumbnail({
               onMoveUp();
             }}
             disabled={!canMoveUp}
-            title="Sposta su"
-            aria-label="Sposta pagina su"
+            title={t("ui.page_thumbnail.move_up")}
+            aria-label={t("ui.page_thumbnail.move_up")}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
               <path d="M8 3l-5 5h10L8 3z" />
@@ -44,8 +46,8 @@ function PageThumbnail({
               onMoveDown();
             }}
             disabled={!canMoveDown}
-            title="Sposta giù"
-            aria-label="Sposta pagina giù"
+            title={t("ui.page_thumbnail.move_down")}
+            aria-label={t("ui.page_thumbnail.move_down")}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
               <path d="M8 13l5-5H3l5 5z" />
@@ -59,8 +61,8 @@ function PageThumbnail({
               e.stopPropagation();
               onDelete();
             }}
-            title="Elimina pagina"
-            aria-label="Elimina pagina"
+            title={t("ui.page_thumbnail.delete")}
+            aria-label={t("ui.page_thumbnail.delete")}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
               <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />

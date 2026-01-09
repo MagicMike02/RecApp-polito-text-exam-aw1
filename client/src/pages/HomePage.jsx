@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import RecapList from "../components/RecapList";
 import { useNotification } from "../contexts/NotificationContext";
 import { getPublicRecaps } from "../services/apiService";
+import { useTranslation } from "react-i18next";
 
 function HomePage() {
+  const { t } = useTranslation();
   const [recaps, setRecaps] = useState([]);
   const [loading, setLoading] = useState(true);
   const { showError } = useNotification();
@@ -16,16 +18,16 @@ function HomePage() {
         setLoading(false);
       })
       .catch((err) => {
-        const errorMsg = err.message || "Errore nel caricamento dei riepiloghi pubblici.";
-        showError("Errore", errorMsg);
+        const errorMsg = err.message || t("ui.home.error_loading");
+        showError(t("ui.home.error_title"), errorMsg);
         setLoading(false);
       });
-  }, [showError]);
+  }, [showError, t]);
 
   return (
     <div>
       <div className="page-header">
-        <h2 className="page-title">Lasciati ispirare dagli altri!</h2>
+        <h2 className="page-title">{t("ui.home.title")}</h2>
       </div>
       <RecapList recaps={recaps} loading={loading} />
     </div>

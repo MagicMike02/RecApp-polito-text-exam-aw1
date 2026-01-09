@@ -10,12 +10,12 @@ router.get('/:id', validateTemplateId, async (req, res) => {
 		const { id } = req.params;
 		const template = await templateDao.getTemplateById(parseInt(id));
 		if (!template) {
-			return res.status(404).json({ error: 'Template not found', details: `No template with id ${id}` });
+			return res.status(404).json({ success: false, error: 'template_not_found', message: `No template with id ${id}` });
 		}
-		res.json(template);
+		res.json({ success: true, data: template });
 	} catch (error) {
 		console.error('Error fetching template:', error);
-		res.status(500).json({ error: 'Database error while fetching template', details: error.message });
+		res.status(500).json({ success: false, error: 'db_fetch_template_error', message: error.message });
 	}
 });
 

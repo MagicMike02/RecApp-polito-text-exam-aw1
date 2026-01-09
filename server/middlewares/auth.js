@@ -2,7 +2,7 @@ export function isAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) {
 		return next();
 	}
-	res.status(401).json({ error: 'Authentication required' });
+	res.status(401).json({ success: false, error: 'auth_required', message: 'Authentication required' });
 }
 
 export function isOwner(req, res, next) {
@@ -10,11 +10,11 @@ export function isOwner(req, res, next) {
 	const currentUserId = req.user?.id;
 
 	if (!currentUserId) {
-		return res.status(401).json({ error: 'Authentication required' });
+		return res.status(401).json({ success: false, error: 'auth_required', message: 'Authentication required' });
 	}
 
 	if (parseInt(resourceUserId) !== currentUserId) {
-		return res.status(403).json({ error: 'Forbidden: You do not own this resource' });
+		return res.status(403).json({ success: false, error: 'forbidden_not_owner', message: 'You do not own this resource' });
 	}
 
 	next();

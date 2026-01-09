@@ -11,8 +11,10 @@ import {
 import { useNotification } from "../contexts/NotificationContext";
 import RecapGalleryCard from "../components/RecapGalleryCard";
 import "./CreateRecapPage.css";
+import { useTranslation } from "react-i18next";
 
 function CreateRecapPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { showError } = useNotification();
   const [activeTab, setActiveTab] = useState("templates");
@@ -40,14 +42,14 @@ function CreateRecapPage() {
         const recapsResult = await getPublicRecaps();
         setPublicRecaps(recapsResult);
       } catch (err) {
-        const errorMsg = err.message || "Error loading data";
-        showError("Errore", errorMsg);
+        const errorMsg = err.message || t("ui.create_recap.error_loading");
+        showError(t("ui.create_recap.error_title"), errorMsg);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [showError]);
+  }, [showError, t]);
 
   useEffect(() => {
     const fetchTemplatesAndBackgrounds = async () => {
@@ -63,12 +65,12 @@ function CreateRecapPage() {
         setTemplates(templatesFull);
         setThemeBackgrounds(themeBackgroundsResult);
       } catch (err) {
-        const errorMsg = err.message || "Error loading templates or backgrounds";
-        showError("Errore", errorMsg);
+        const errorMsg = err.message || t("ui.create_recap.error_loading_templates");
+        showError(t("ui.create_recap.error_title"), errorMsg);
       }
     };
     fetchTemplatesAndBackgrounds();
-  }, [selectedTheme, showError]);
+  }, [selectedTheme, showError, t]);
 
   const handleCreateFromTemplate = (templateId) => {
     navigate(`/editor/new?template=${templateId}`);
@@ -82,9 +84,9 @@ function CreateRecapPage() {
     return (
       <div className="crp-create-recap-container crp-center-text">
         <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t("ui.create_recap.loading")}</span>
         </Spinner>
-        <p className="mt-3">Loading options...</p>
+        <p className="mt-3">{t("ui.create_recap.loading_options")}</p>
       </div>
     );
   }
@@ -92,17 +94,17 @@ function CreateRecapPage() {
   return (
     <div className="crp-create-recap-container">
       <div className="crp-create-recap-header">
-        <h1 className="crp-create-recap-title">Crea un nuovo riepilogo</h1>
+        <h1 className="crp-create-recap-title">{t("ui.create_recap.title")}</h1>
         <button className="crp-create-recap-cancel" onClick={() => navigate("/profile")}>
-          Annulla
+          {t("ui.actions.cancel")}
         </button>
       </div>
 
       <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="crp-create-recap-tabs mb-4">
-        <Tab eventKey="templates" title="Da Template">
+        <Tab eventKey="templates" title={t("ui.create_recap.tab_templates")}>
           <div className="crp-create-recap-section">
             {/* TITOLO */}
-            <h2 className="crp-theme-title">Scegli un tema:</h2>
+            <h2 className="crp-theme-title">{t("ui.create_recap.choose_theme")}</h2>
 
             {/* BOTTONI SELEZIONE TEMA */}
             <div className="crp-theme-btns">
@@ -119,7 +121,7 @@ function CreateRecapPage() {
 
             {/* LISTA TEMPLATE */}
             {templates.length === 0 ? (
-              <Alert variant="info">Nessun template disponibile per questo tema.</Alert>
+              <Alert variant="info">{t("ui.create_recap.no_templates")}</Alert>
             ) : (
               <div className="crp-list">
                 {templates.map((template) => {
@@ -145,13 +147,13 @@ function CreateRecapPage() {
           </div>
         </Tab>
 
-        <Tab eventKey="recaps" title="Da Recap Pubblico">
+        <Tab eventKey="recaps" title={t("ui.create_recap.tab_public_recaps")}>
           <div className="crp-create-recap-section">
             <Alert variant="info">
-              Crea un nuovo recap ispirato a un recap pubblico. La tua versione terrà traccia dell'originale.
+              {t("ui.create_recap.description")}
             </Alert>
             {publicRecaps.length === 0 ? (
-              <Alert variant="warning">Nessun recap pubblico disponibile.</Alert>
+              <Alert variant="warning">{t("ui.create_recap.no_public_recaps")}</Alert>
             ) : (
               <div className="crp-list">
                 {publicRecaps.map((recap) => (

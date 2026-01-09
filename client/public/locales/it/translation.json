@@ -1,0 +1,174 @@
+{
+	"api_errors": {
+		"invalid_credentials": "Credenziali errate.",
+		"recap_not_found": "Recap non trovato.",
+		"template_not_found": "Template non trovato.",
+		"theme_not_found": "Tema non trovato.",
+		"db_fetch_template_error": "Errore nel recupero del template.",
+		"db_fetch_theme_error": "Errore nel recupero del tema.",
+		"db_fetch_themes_error": "Errore nel recupero dei temi.",
+		"db_fetch_templates_error": "Errore nel recupero dei template.",
+		"db_fetch_images_error": "Errore nel recupero delle immagini.",
+		"db_fetch_image_error": "Errore nel recupero dell'immagine.",
+		"auth_required": "Autenticazione richiesta.",
+		"forbidden_not_owner": "Non sei il proprietario della risorsa."
+	},
+	"ui": {
+		"nav": {
+			"brand": "RecApp",
+			"home": "Home",
+			"my_recaps": "I miei riepiloghi",
+			"login": "Accedi",
+			"user_fallback": "Utente"
+		},
+		"buttons": {
+			"logout": "Esci",
+			"confirm": "Conferma"
+		},
+		"langswitch": {
+			"to_it": "Passa all'italiano",
+			"to_en": "Pass to English"
+		},
+		"actions": {
+			"confirm": "Conferma",
+			"cancel": "Annulla",
+			"ok": "Ok",
+			"close": "Chiudi",
+			"save": "Salva",
+			"delete": "Elimina"
+		},
+		"login": {
+			"title": "Accesso",
+			"username": "Nome utente",
+			"password": "Password",
+			"submit": "Accedi",
+			"submit_button": "Accedi",
+			"username_label": "Nome utente",
+			"password_label": "Password",
+			"loading": "Accesso in corso...",
+			"missing_fields": "Inserisci nome utente e password",
+			"test_info": "Utenti di test: alice, bob, charlie\nPassword: Alice2025!, Bob@2025, Charlie#2025"
+		},
+		"logout": {
+			"button": "Esci"
+		},
+		"dashboard": {
+			"welcome": "Benvenuto, {{name}}!",
+			"recap_title": "Riepilogo annuale"
+		},
+		"page": "Pagina {{count}}",
+		"recap_list": {
+			"empty": "Nessun riepilogo pubblico trovato."
+		},
+		"recap_card": {
+			"by": "di",
+			"public": "Pubblico",
+			"private": "Privato",
+			"from": "Da",
+			"view": "Visualizza",
+			"preview": "Anteprima",
+			"use_template": "Usa template"
+		},
+		"background_selector": {
+			"empty": "Nessun background disponibile",
+			"text_fields_count_one": "1 campo",
+			"text_fields_count_other": "{{count}} campi"
+		},
+		"page_preview": {
+			"select_background": "Seleziona un background per visualizzare la pagina"
+		},
+		"page_thumbnail": {
+			"move_up": "Sposta su",
+			"move_down": "Sposta giù",
+			"delete": "Elimina pagina"
+		},
+		"result_modal": {
+			"deleting": "Eliminazione..."
+		},
+		"home": {
+			"title": "Lasciati ispirare dagli altri!",
+			"error_loading": "Errore nel caricamento dei riepiloghi pubblici.",
+			"error_title": "Errore"
+		},
+		"profile": {
+			"title": "I tuoi recap",
+			"create_button": "+ Crea nuovo riepilogo",
+			"error_loading": "Errore nel caricamento dei recap",
+			"error_title": "Errore"
+		},
+		"create_recap": {
+			"title": "Crea un nuovo riepilogo",
+			"loading": "Caricamento...",
+			"loading_options": "Caricamento opzioni...",
+			"tab_templates": "Da Template",
+			"tab_public_recaps": "Da Recap Pubblico",
+			"choose_theme": "Scegli un tema:",
+			"no_templates": "Nessun template disponibile per questo tema.",
+			"description": "Crea un nuovo recap ispirato a un recap pubblico. La tua versione terrà traccia dell'originale.",
+			"no_public_recaps": "Nessun recap pubblico disponibile.",
+			"error_loading": "Errore durante il caricamento dei dati.",
+			"error_loading_templates": "Errore durante il caricamento dei template o dei background.",
+			"error_title": "Errore"
+		},
+		"editor": {
+			"new_title": "Nuovo {{name}}",
+			"copy_title": "Copia di {{title}}",
+			"invalid_params": "Parametri non validi. Usa ?template=ID o ?clone=ID",
+			"error_title": "Errore",
+			"error_loading": "Errore durante il caricamento",
+			"error_saving": "Errore durante il salvataggio",
+			"success_title": "Successo!",
+			"done": "Fatto",
+			"page_deleted": "Pagina eliminata con successo",
+			"delete_page_title": "Elimina Pagina?",
+			"delete_page_confirm": "Sei sicuro di voler eliminare la pagina {{page}}? Questa azione non può essere annullata.",
+			"back_to_create": "Torna alla creazione",
+			"loading": "Caricamento editor...",
+			"page_count_one": "1 pagina",
+			"page_count_other": "{{count}} pagine",
+			"add_page": "Aggiungi Pagina",
+			"edit_title": "Modifica Riepilogo",
+			"title_label": "Titolo",
+			"title_placeholder": "Inserisci un titolo...",
+			"visibility_label": "Visibilità",
+			"private": "Privato",
+			"public": "Pubblico",
+			"page_label": "Pagina {{page}}",
+			"page_status": "Pagina {{current}} di {{total}}",
+			"text1": "Testo 1",
+			"text1_placeholder": "Inserisci il primo testo...",
+			"text2": "Testo 2",
+			"text2_placeholder": "Inserisci il secondo testo...",
+			"text3": "Testo 3",
+			"text3_placeholder": "Inserisci il terzo testo...",
+			"choose_background": "Scegli Background",
+			"saving": "Salvataggio...",
+			"save_button": "Salva Riepilogo"
+		},
+		"viewer": {
+			"error_loading": "Errore nel caricamento del recap.",
+			"error_title": "Errore",
+			"delete_title": "Elimina recap",
+			"delete_confirm": "Sei sicuro di voler eliminare questo recap?",
+			"delete_success_title": "Recap eliminato",
+			"delete_success_msg": "Il recap è stato eliminato con successo.",
+			"delete_error": "Errore durante l'eliminazione: {{msg}}",
+			"back": "Torna indietro",
+			"delete": "Elimina",
+			"page_alt": "Pagina {{page}}",
+			"prev": "Precedente",
+			"next": "Successiva",
+			"page_status": "Pagina {{current}} di {{total}}"
+		},
+		"validation": {
+			"error_title": "Errore di validazione",
+			"title_required": "Inserisci un titolo per il riepilogo",
+			"min_pages": "Servono almeno 3 pagine per creare un riepilogo!",
+			"select_background": "Pagina {{page}}: devi selezionare un background",
+			"text_required": "Pagina {{page}}: devi inserire almeno un testo"
+		}
+	},
+	"notifications": {
+		"recap_created_success": "Riepilogo creato con successo!"
+	}
+}

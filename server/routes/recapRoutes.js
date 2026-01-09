@@ -8,20 +8,20 @@ const router = express.Router();
 router.get('/public', async (req, res) => {
 	try {
 		const recaps = await recapDao.getPublicRecaps();
-		res.json(recaps);
+		res.json({ success: true, data: recaps });
 	} catch (error) {
 		console.error('Error fetching public recaps:', error);
-		res.status(500).json({ error: 'Error fetching public recaps' });
+		res.status(500).json({ success: false, error: 'fetch_public_recaps_error', message: 'Error fetching public recaps' });
 	}
 });
 
 router.get('/my', isAuthenticated, async (req, res) => {
 	try {
 		const recaps = await recapDao.getRecapsByUser(req.user.id);
-		res.json(recaps);
+		res.json({ success: true, data: recaps });
 	} catch (error) {
 		console.error('Error fetching user recaps:', error);
-		res.status(500).json({ error: 'Error fetching user recaps' });
+		res.status(500).json({ success: false, error: 'fetch_user_recaps_error', message: 'Error fetching user recaps' });
 	}
 });
 
@@ -32,13 +32,13 @@ router.get('/:id', validateRecapId, async (req, res) => {
 		const recap = await recapDao.getRecapById(parseInt(id), userId);
 
 		if (!recap) {
-			return res.status(404).json({ error: 'Recap not found' });
+			return res.status(404).json({ success: false, error: 'recap_not_found', message: 'Recap not found' });
 		}
 
-		res.json(recap);
+		res.json({ success: true, data: recap });
 	} catch (error) {
 		console.error('Error fetching recap:', error);
-		res.status(500).json({ error: 'Error fetching recap' });
+		res.status(500).json({ success: false, error: 'fetch_recap_error', message: 'Error fetching recap' });
 	}
 });
 
@@ -50,10 +50,10 @@ router.post('/', isAuthenticated, validateCreateRecap, async (req, res) => {
 		if (derived_from_recap_id) {
 			const originalRecap = await recapDao.getRecapById(derived_from_recap_id);
 			if (!originalRecap) {
-				return res.status(404).json({ error: 'Original recap not found' });
+				return res.status(404).json({ success: false, error: 'original_recap_not_found', message: 'Original recap not found' });
 			}
 			if (originalRecap.visibility === 'private') {
-				return res.status(403).json({ error: 'Cannot derive from a private recap' });
+				return res.status(403).json({ success: false, error: 'cannot_derive_private_recap', message: 'Cannot derive from a private recap' });
 			}
 			derivationInfo = {
 				derived_from_recap_id,
@@ -82,10 +82,10 @@ router.post('/', isAuthenticated, validateCreateRecap, async (req, res) => {
 		}
 
 		const newRecap = await recapDao.getRecapById(recapId);
-		res.status(201).json(newRecap);
+		res.status(201).json({ success: true, data: newRecap });
 	} catch (error) {
 		console.error('Error creating recap:', error);
-		res.status(500).json({ error: 'Error creating recap' });
+		res.status(500).json({ success: false, error: 'create_recap_error', message: 'Error creating recap' });
 	}
 });
 
@@ -95,11 +95,11 @@ router.put('/:id', isAuthenticated, validateUpdateRecap, async (req, res) => {
 		const recap = await recapDao.getRecapById(parseInt(id));
 
 		if (!recap) {
-			return res.status(404).json({ error: 'Recap not found' });
+			return res.status(404).json({ success: false, error: 'recap_not_found', message: 'Recap not found' });
 		}
 
 		if (recap.user_id !== req.user.id) {
-			return res.status(403).json({ error: 'Forbidden: You do not have permission to update this recap' });
+			return res.status(403).json({ success: false, error: 'forbidden_update_recap', message: 'Forbidden: You do not have permission to update this recap' });
 		}
 
 		const { title, visibility, pages } = req.body;
@@ -123,10 +123,10 @@ router.put('/:id', isAuthenticated, validateUpdateRecap, async (req, res) => {
 		}
 
 		const updatedRecap = await recapDao.getRecapById(parseInt(id));
-		res.json(updatedRecap);
+		res.json({ success: true, data: updatedRecap });
 	} catch (error) {
 		console.error('Error updating recap:', error);
-		res.status(500).json({ error: 'Error updating recap' });
+		res.status(500).json({ success: false, error: 'update_recap_error', message: 'Error updating recap' });
 	}
 });
 
@@ -137,21 +137,21 @@ router.delete('/:id', isAuthenticated, validateRecapId, async (req, res) => {
 		const recap = await recapDao.getRecapById(parseInt(id), userId);
 
 		if (!recap) {
-			return res.status(404).json({ error: 'Recap not found' });
+			return res.status(404).json({ success: false, error: 'recap_not_found', message: 'Recap not found' });
 		}
 
 		if (recap.user_id !== req.user.id) {
-			return res.status(403).json({ error: 'Forbidden: You do not have permission to delete this recap' });
+			return res.status(403).json({ success: false, error: 'forbidden_delete_recap', message: 'Forbidden: You do not have permission to delete this recap' });
 		}
 
 		const deleted = await recapDao.deleteRecap(parseInt(id), req.user.id);
 		if (!deleted) {
-			return res.status(500).json({ error: 'Failed to delete recap' });
+			return res.status(500).json({ success: false, error: 'delete_recap_failed', message: 'Failed to delete recap' });
 		}
-		res.json({ message: 'Recap deleted successfully' });
+		res.json({ success: true, data: { message: 'Recap deleted successfully' } });
 	} catch (error) {
 		console.error('Error deleting recap:', error);
-		res.status(500).json({ error: 'Error deleting recap' });
+		res.status(500).json({ success: false, error: 'delete_recap_error', message: 'Error deleting recap' });
 	}
 });
 

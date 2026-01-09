@@ -99,3 +99,31 @@
   color: #fff;
   text-decoration: none;
 }
+
+.language-switcher {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.language-switcher button {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0.25rem 0.75rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s, border 0.15s;
+  color: #333;
+}
+
+.language-switcher button.active {
+  background: #f0f0f0;
+  border: 1px solid #bdbdbd;
+  font-weight: bold;
+}
+
+.language-switcher button:hover:not(.active) {
+  background: #f7f7f7;
+  border: 1px solid #e0e0e0;
+}

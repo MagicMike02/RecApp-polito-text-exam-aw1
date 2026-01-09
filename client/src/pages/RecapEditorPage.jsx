@@ -7,8 +7,10 @@ import BackgroundSelector from "../components/BackgroundSelector";
 import PageThumbnail from "../components/PageThumbnail";
 import { Spinner } from "react-bootstrap";
 import "./RecapEditorPage.css";
+import { useTranslation } from "react-i18next";
 
 function RecapEditorPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { showModal, hideModal, showToast, hideToast, showError, showSuccess, confirmAction } = useNotification();
@@ -43,7 +45,7 @@ function RecapEditorPage() {
           const bgImages = await getImagesByTheme(template.theme_id);
 
           setRecapData({
-            title: `Nuovo ${template.name}`,
+            title: t("ui.editor.new_title", { name: template.name }),
             visibility: "private",
             theme_id: template.theme_id,
             derived_from_recap_id: null,
@@ -62,7 +64,7 @@ function RecapEditorPage() {
           const bgImages = await getImagesByTheme(recap.theme_id);
 
           setRecapData({
-            title: `Copia di ${recap.title}`,
+            title: t("ui.editor.copy_title", { title: recap.title }),
             visibility: "private",
             theme_id: recap.theme_id,
             derived_from_recap_id: recap.id,
@@ -76,21 +78,21 @@ function RecapEditorPage() {
           });
           setBackgrounds(bgImages);
         } else {
-          const errorMsg = "Parametri non validi. Usa ?template=ID o ?clone=ID";
+          const errorMsg = t("ui.editor.invalid_params");
           setError(errorMsg);
-          showError("Errore", errorMsg);
+          showError(t("ui.editor.error_title"), errorMsg);
         }
       } catch (err) {
-        const errorMsg = err.message || "Errore durante il caricamento";
+        const errorMsg = err.message || t("ui.editor.error_loading");
         setError(errorMsg);
-        showError("Errore", errorMsg);
+        showError(t("ui.editor.error_title"), errorMsg);
       } finally {
         setLoading(false);
       }
     };
 
     initEditor();
-  }, [searchParams, showError]);
+  }, [searchParams, showError, t]);
 
   const updateTitle = (value) => {
     setRecapData((prev) => ({ ...prev, title: value }));
@@ -134,15 +136,15 @@ function RecapEditorPage() {
 
   const deletePage = (index) => {
     if (recapData.pages.length <= 3) {
-      showToast("error", "Errore", "Servono almeno 3 pagine per creare un riepilogo!");
+      showToast("error", t("ui.editor.error_title"), t("ui.validation.min_pages"));
       return;
     }
 
     setDeletePageIndex(index);
     showModal(
       "confirm",
-      "Elimina Pagina?",
-      `Sei sicuro di voler eliminare la pagina ${index + 1}? Questa azione non può essere annullata.`,
+      t("ui.editor.delete_page_title"),
+      t("ui.editor.delete_page_confirm", { page: index + 1 }),
       async () => {
         setIsDeleting(true);
         setTimeout(() => {
@@ -160,7 +162,7 @@ function RecapEditorPage() {
           setIsDeleting(false);
           setDeletePageIndex(null);
 
-          showToast("success", "Fatto", "Pagina eliminata con successo");
+          showToast("success", t("ui.editor.done"), t("ui.editor.page_deleted"));
         }, 300);
       }
     );
@@ -184,10 +186,10 @@ function RecapEditorPage() {
 
   const validateRecap = () => {
     if (!recapData.title.trim()) {
-      return "Inserisci un titolo per il riepilogo";
+      return t("ui.validation.title_required");
     }
     if (recapData.pages.length < 3) {
-      return "Servono almeno 3 pagine";
+      return t("ui.validation.min_pages");
     }
 
     // Validazione per ogni pagina
@@ -196,14 +198,14 @@ function RecapEditorPage() {
 
       // Controlla che il background sia selezionato
       if (!page.background_image_id) {
-        return `Pagina ${i + 1}: devi selezionare un background`;
+        return t("ui.validation.select_background", { page: i + 1 });
       }
 
       // Controlla che almeno un campo di testo sia compilato
       const hasText = page.text_field_1?.trim() || page.text_field_2?.trim() || page.text_field_3?.trim();
 
       if (!hasText) {
-        return `Pagina ${i + 1}: devi inserire almeno un testo`;
+        return t("ui.validation.text_required", { page: i + 1 });
       }
     }
 
@@ -214,7 +216,7 @@ function RecapEditorPage() {
     // Validazioni
     const validationError = validateRecap();
     if (validationError) {
-      showToast("error", "Errore di validazione", validationError);
+      showToast("error", t("ui.validation.error_title"), validationError);
       return;
     }
 
@@ -229,26 +231,26 @@ function RecapEditorPage() {
 
       await createRecap(payload);
 
-      showSuccess("Successo!", "Recap creato con successo!");
+      showSuccess(t("ui.editor.success_title"), t("notifications.recap_created_success"));
 
       setTimeout(() => {
         navigate("/profile");
       }, 2000);
     } catch (err) {
       // Cerca di estrarre messaggio di errore dall'API
-      let errorMsg = "Errore durante il salvataggio";
+      let errorMsg = t("ui.editor.error_saving");
 
       if (err.response?.data?.errors) {
         // Errori di validazione dal backend
         const errors = err.response.data.errors;
         errorMsg = errors.map((e) => e.msg).join(", ");
       } else if (err.response?.data?.error) {
-        errorMsg = err.response.data.error;
+        errorMsg = t(`api_errors.${err.response.data.error}`);
       } else if (err.message) {
         errorMsg = err.message;
       }
 
-      showError("Errore", errorMsg);
+      showError(t("ui.editor.error_title"), errorMsg);
     } finally {
       setSaving(false);
     }
@@ -258,7 +260,7 @@ function RecapEditorPage() {
     return (
       <div className="editor-loading">
         <Spinner animation="border" role="status" />
-        <p>Caricamento editor...</p>
+        <p>{t("ui.editor.loading")}</p>
       </div>
     );
   }
@@ -267,10 +269,10 @@ function RecapEditorPage() {
     return (
       <div className="editor-error">
         <div style={{ padding: "2rem", textAlign: "center" }}>
-          <h2 style={{ color: "#e74c3c", marginBottom: "1rem" }}>Errore</h2>
+          <h2 style={{ color: "#e74c3c", marginBottom: "1rem" }}>{t("ui.editor.error_title")}</h2>
           <p style={{ marginBottom: "1.5rem" }}>{error}</p>
           <button className="btn btn-primary-custom" onClick={() => navigate("/create")}>
-            Torna alla creazione
+            {t("ui.editor.back_to_create")}
           </button>
         </div>
       </div>
@@ -279,13 +281,14 @@ function RecapEditorPage() {
 
   const currentPage = recapData.pages[currentPageIndex];
   const currentBackground = backgrounds.find((bg) => bg.id === currentPage?.background_image_id);
+  const totalPages = recapData.pages.length;
 
   return (
     <div className="editor-container">
       {/* SIDEBAR SINISTRA - Lista Pagine */}
       <aside className="editor-sidebar">
         <div className="editor-sidebar-header">
-          <h3 className="editor-sidebar-title">Pagine ({recapData.pages.length})</h3>
+          <h3 className="editor-sidebar-title">{t("ui.editor.page_count", { count: totalPages })}</h3>
         </div>
 
         <div className="editor-sidebar-content">
@@ -311,7 +314,7 @@ function RecapEditorPage() {
             <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10 5v10M5 10h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
-            Aggiungi Pagina
+            {t("ui.editor.add_page")}
           </button>
         </div>
       </aside>
@@ -321,7 +324,7 @@ function RecapEditorPage() {
         <div className="editor-preview-container">
           <PagePreview page={currentPage} background={currentBackground} />
           <div className="editor-preview-info">
-            Pagina {currentPageIndex + 1} di {recapData.pages.length}
+            {t("ui.editor.page_status", { current: currentPageIndex + 1, total: totalPages })}
           </div>
         </div>
       </main>
@@ -329,32 +332,32 @@ function RecapEditorPage() {
       {/* PANNELLO DESTRO - Controlli */}
       <aside className="editor-controls">
         <div className="editor-controls-header">
-          <h2 className="editor-controls-title">Modifica Riepilogo</h2>
+          <h2 className="editor-controls-title">{t("ui.editor.edit_title")}</h2>
         </div>
 
         <div className="editor-controls-content">
           {/* Titolo e Visibilità */}
           <div className="editor-section">
             <div className="form-group">
-              <label className="form-label-custom">Titolo</label>
+              <label className="form-label-custom">{t("ui.editor.title_label")}</label>
               <input
                 type="text"
                 className="form-control"
                 value={recapData.title}
                 onChange={(e) => updateTitle(e.target.value)}
-                placeholder="Inserisci un titolo..."
+                placeholder={t("ui.editor.title_placeholder")}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label-custom">Visibilità</label>
+              <label className="form-label-custom">{t("ui.editor.visibility_label")}</label>
               <select
                 className="form-control"
                 value={recapData.visibility}
                 onChange={(e) => updateVisibility(e.target.value)}
               >
-                <option value="private">Privato</option>
-                <option value="public">Pubblico</option>
+                <option value="private">{t("ui.editor.private")}</option>
+                <option value="public">{t("ui.editor.public")}</option>
               </select>
             </div>
           </div>
@@ -363,50 +366,50 @@ function RecapEditorPage() {
 
           {/* Testi Pagina Corrente */}
           <div className="editor-section">
-            <h3 className="editor-section-title">Pagina {currentPageIndex + 1}</h3>
+            <h3 className="editor-section-title">{t("ui.editor.page_label", { page: currentPageIndex + 1 })}</h3>
 
             {currentBackground ? (
               <>
                 <div className="form-group">
-                  <label className="form-label-custom">Testo 1</label>
+                  <label className="form-label-custom">{t("ui.editor.text1")}</label>
                   <textarea
                     className="form-control"
                     rows="3"
                     value={currentPage.text_field_1}
                     onChange={(e) => updatePageText("text_field_1", e.target.value)}
-                    placeholder="Inserisci il primo testo..."
+                    placeholder={t("ui.editor.text1_placeholder")}
                   />
                 </div>
 
                 {currentBackground.text_fields_count >= 2 && (
                   <div className="form-group">
-                    <label className="form-label-custom">Testo 2</label>
+                    <label className="form-label-custom">{t("ui.editor.text2")}</label>
                     <textarea
                       className="form-control"
                       rows="3"
                       value={currentPage.text_field_2}
                       onChange={(e) => updatePageText("text_field_2", e.target.value)}
-                      placeholder="Inserisci il secondo testo..."
+                      placeholder={t("ui.editor.text2_placeholder")}
                     />
                   </div>
                 )}
 
                 {currentBackground.text_fields_count >= 3 && (
                   <div className="form-group">
-                    <label className="form-label-custom">Testo 3</label>
+                    <label className="form-label-custom">{t("ui.editor.text3")}</label>
                     <textarea
                       className="form-control"
                       rows="3"
                       value={currentPage.text_field_3}
                       onChange={(e) => updatePageText("text_field_3", e.target.value)}
-                      placeholder="Inserisci il terzo testo..."
+                      placeholder={t("ui.editor.text3_placeholder")}
                     />
                   </div>
                 )}
               </>
             ) : (
               <div style={{ padding: "1rem", textAlign: "center", color: "var(--text-muted)" }}>
-                Seleziona un background per aggiungere testi
+                {t("ui.validation.select_background", { page: currentPageIndex + 1 })}
               </div>
             )}
           </div>
@@ -415,7 +418,7 @@ function RecapEditorPage() {
 
           {/* Background Selector */}
           <div className="editor-section">
-            <h3 className="editor-section-title">Scegli Background</h3>
+            <h3 className="editor-section-title">{t("ui.editor.choose_background")}</h3>
             <BackgroundSelector
               backgrounds={backgrounds}
               selectedId={currentPage?.background_image_id}
@@ -431,10 +434,10 @@ function RecapEditorPage() {
             onClick={handleSave}
             disabled={saving || recapData.pages.length < 3}
           >
-            {saving ? "Salvataggio..." : "Salva Riepilogo"}
+            {saving ? t("ui.editor.saving") : t("ui.editor.save_button")}
           </button>
           <button className="btn btn-outline-nav w-100" onClick={() => navigate(-1)} disabled={saving}>
-            Annulla
+            {t("ui.actions.cancel")}
           </button>
         </div>
       </aside>

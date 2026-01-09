@@ -1,5 +1,6 @@
 import { Modal, Button } from "react-bootstrap";
 import "./ResultModal.css";
+import { useTranslation } from "react-i18next";
 
 function ResultModal({
   show,
@@ -8,10 +9,11 @@ function ResultModal({
   message,
   onClose,
   onConfirm,
-  confirmText = "Conferma",
-  cancelText = "Annulla",
+  confirmText,
+  cancelText,
   isLoading = false,
 }) {
+  const { t } = useTranslation();
   const isConfirmMode = type === "confirm";
 
   return (
@@ -80,15 +82,15 @@ function ResultModal({
         {isConfirmMode ? (
           <>
             <Button className="result-modal-btn result-modal-btn-cancel" onClick={onClose} disabled={isLoading}>
-              {cancelText}
+              {cancelText || t("ui.actions.cancel")}
             </Button>
             <Button className="result-modal-btn result-modal-btn-danger" onClick={onConfirm} disabled={isLoading}>
-              {isLoading ? "Eliminazione..." : confirmText}
+              {isLoading ? t("ui.result_modal.deleting") : confirmText || t("ui.actions.confirm")}
             </Button>
           </>
         ) : (
           <Button className={`result-modal-btn result-modal-btn-${type}`} onClick={onClose}>
-            {type === "success" ? "Ok" : "Chiudi"}
+            {type === "success" ? t("ui.actions.ok") : t("ui.actions.close")}
           </Button>
         )}
       </Modal.Footer>

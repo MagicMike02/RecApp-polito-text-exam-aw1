@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import "./Toast.css";
+import { useTranslation } from "react-i18next";
 
 function Toast({ show, type, title, message, onClose, duration = 3000 }) {
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (!show) return;
 
@@ -86,7 +89,7 @@ function Toast({ show, type, title, message, onClose, duration = 3000 }) {
           {title && <div className="toast-title">{title}</div>}
           {message && <div className="toast-message">{message}</div>}
         </div>
-        <button className="toast-close" onClick={onClose}>
+        <button className="toast-close" onClick={onClose} aria-label={t("ui.actions.close")}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"

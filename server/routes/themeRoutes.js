@@ -9,10 +9,10 @@ const router = express.Router();
 router.get('/', async (req, res) => {
 	try {
 		const themes = await themeDao.getAllThemes();
-		res.json(themes);
+		res.json({ success: true, data: themes });
 	} catch (error) {
 		console.error('Error fetching themes:', error);
-		res.status(500).json({ error: 'Error fetching themes' });
+		res.status(500).json({ success: false, error: 'db_fetch_themes_error', message: error.message });
 	}
 });
 
@@ -22,13 +22,13 @@ router.get('/:id', validateId, async (req, res) => {
 		const theme = await themeDao.getThemeById(parseInt(id));
 
 		if (!theme) {
-			return res.status(404).json({ error: 'Theme not found' });
+			return res.status(404).json({ success: false, error: 'theme_not_found', message: `No theme with id ${id}` });
 		}
 
-		res.json(theme);
+		res.json({ success: true, data: theme });
 	} catch (error) {
 		console.error('Error fetching theme:', error);
-		res.status(500).json({ error: 'Error fetching theme' });
+		res.status(500).json({ success: false, error: 'db_fetch_theme_error', message: error.message });
 	}
 });
 
@@ -36,10 +36,10 @@ router.get('/:themeId/templates', validateThemeId, async (req, res) => {
 	try {
 		const { themeId } = req.params;
 		const templates = await templateDao.getTemplatesByTheme(parseInt(themeId));
-		res.json(templates);
+		res.json({ success: true, data: templates });
 	} catch (error) {
 		console.error('Error fetching templates:', error);
-		res.status(500).json({ error: 'Error fetching templates' });
+		res.status(500).json({ success: false, error: 'db_fetch_templates_error', message: error.message });
 	}
 });
 
@@ -49,13 +49,13 @@ router.get('/templates/:id', validateTemplateId, async (req, res) => {
 		const template = await templateDao.getTemplateById(parseInt(id));
 
 		if (!template) {
-			return res.status(404).json({ error: 'Template not found' });
+			return res.status(404).json({ success: false, error: 'template_not_found', message: `No template with id ${id}` });
 		}
 
-		res.json(template);
+		res.json({ success: true, data: template });
 	} catch (error) {
 		console.error('Error fetching template:', error);
-		res.status(500).json({ error: 'Error fetching template' });
+		res.status(500).json({ success: false, error: 'db_fetch_template_error', message: error.message });
 	}
 });
 

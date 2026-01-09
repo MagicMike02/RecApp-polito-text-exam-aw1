@@ -1,12 +1,14 @@
 import PropTypes from "prop-types";
 import "./BackgroundSelector.css";
 import { FALLBACK_IMAGE_URL } from "../constants";
+import { useTranslation } from "react-i18next";
 
 function BackgroundSelector({ backgrounds, selectedId, onSelect }) {
+  const { t } = useTranslation();
   if (!backgrounds || backgrounds.length === 0) {
     return (
       <div className="background-selector-empty">
-        <p className="background-selector-empty-text">Nessun background disponibile</p>
+        <p className="background-selector-empty-text">{t("ui.background_selector.empty")}</p>
       </div>
     );
   }
@@ -37,7 +39,7 @@ function BackgroundSelector({ backgrounds, selectedId, onSelect }) {
                 {/* Badge con numero di campi testo */}
                 {bg.text_fields_count && (
                   <span className="background-selector-badge">
-                    {bg.text_fields_count} {bg.text_fields_count === 1 ? "campo" : "campi"}
+                    {t("ui.background_selector.text_fields_count", { count: bg.text_fields_count })}
                   </span>
                 )}
               </div>

@@ -7,28 +7,34 @@ const apiClient = axios.create({
 	headers: {
 		'Content-Type': 'application/json',
 	},
-	withCredentials: true, 
+	withCredentials: true,
 });
 
-//response interceptor
+// Centralized response interceptor for unwrapping and error handling
 apiClient.interceptors.response.use(
-	(response) => response.data, 
-	(error) => {
-		if (error.response) {
-			const errorData = error.response.data;
-			const errorMessage = errorData?.message || errorData?.error || 'API call failed';
-			const errorDetails = errorData?.errors ? JSON.stringify(errorData.errors, null, 2) : null;
-
-			console.error(`[API ERROR ${error.response.status}]`, {
-				message: errorMessage,
-				details: errorDetails,
-				fullResponse: errorData,
-			});
-
-			const fullError = errorDetails ? `${errorMessage}\n\nDettagli:\n${errorDetails}` : errorMessage;
-			return Promise.reject(new Error(fullError));
+	(response) => {
+		const data = response.data;
+		if (data && typeof data === 'object') {
+			if (data.success === true) {
+				return data.data;
+			} else if (data.success === false && data.error) {
+				const err = new Error('API Error');
+				err.key = data.error;
+				err.i18nKey = `api_errors.${data.error}`;
+				return Promise.reject(err);
+			}
 		}
-		console.error('Network error:', error.message);
+		// Fallback: reject generic error
+		return Promise.reject(new Error('Unknown API response format'));
+	},
+	(error) => {
+		if (error.response && error.response.data && error.response.data.error) {
+			const err = new Error('API Error');
+			err.key = error.response.data.error;
+			err.i18nKey = `api_errors.${error.response.data.error}`;
+			return Promise.reject(err);
+		}
+		// Network or unexpected error
 		return Promise.reject(error);
 	}
 );
@@ -37,7 +43,7 @@ async function apiCall(endpoint, options = {}) {
 	const { method = 'GET', data, params, headers } = options;
 
 	try {
-		console.log(`[API] ${method} ${endpoint}`, data || params); 
+		console.log(`[API] ${method} ${endpoint}`, data || params);
 		const result = await apiClient.request({
 			url: endpoint,
 			method,

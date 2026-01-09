@@ -1,8 +1,10 @@
 import PropTypes from "prop-types";
 import "./PagePreview.css";
 import { FALLBACK_IMAGE_URL } from "../constants";
+import { useTranslation } from "react-i18next";
 
 function PagePreview({ page, background, className = "" }) {
+  const { t } = useTranslation();
   const backgroundUrl = background?.url || FALLBACK_IMAGE_URL;
   const textPositions = background?.text_positions?.fields || [];
   const isEmpty = !page || !background;
@@ -31,7 +33,7 @@ function PagePreview({ page, background, className = "" }) {
       {/* Text overlay con posizionamento assoluto basato su coordinate DB */}
       <div className="page-preview-overlay">
         {isEmpty ? (
-          <p className="page-preview-placeholder">Seleziona un background per visualizzare la pagina</p>
+          <p className="page-preview-placeholder">{t("ui.page_preview.select_background")}</p>
         ) : (
           texts.map((item, index) => {
             const { x, y, w, h } = item.position;

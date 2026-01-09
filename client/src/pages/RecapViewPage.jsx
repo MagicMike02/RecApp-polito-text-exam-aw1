@@ -6,8 +6,10 @@ import { FALLBACK_IMAGE_URL } from "../constants";
 import { useNotification } from "../contexts/NotificationContext";
 import "./RecapViewPage.css";
 import { useAuth } from "../contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 
 function RecapViewPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
   const [recap, setRecap] = useState(null);
@@ -27,20 +29,20 @@ function RecapViewPage() {
         setCurrentPage(0);
       })
       .catch((err) => {
-        const errorMsg = err.message || "Errore nel caricamento del recap.";
-        showError("Errore", errorMsg);
+        const errorMsg = err.message || t("ui.viewer.error_loading");
+        showError(t("ui.viewer.error_title"), errorMsg);
         setLoading(false);
       });
-  }, [id, showError, confirmAction]);
+  }, [id, showError, confirmAction, t]);
 
   const handleDelete = async () => {
-    await confirmAction("Elimina recap", "Sei sicuro di voler eliminare questo recap?", async () => {
+    await confirmAction(t("ui.viewer.delete_title"), t("ui.viewer.delete_confirm"), async () => {
       try {
         await deleteRecap(id);
-        showSuccess("Recap eliminato", "Il recap è stato eliminato con successo.");
+        showSuccess(t("ui.viewer.delete_success_title"), t("ui.viewer.delete_success_msg"));
         navigate("/profile");
       } catch (error) {
-        showError("Errore", `Errore durante l'eliminazione: ${error.message}`);
+        showError(t("ui.viewer.error_title"), t("ui.viewer.delete_error", { msg: error.message }));
       }
     });
   };
@@ -55,12 +57,13 @@ function RecapViewPage() {
 
   const pages = recap.pages || [];
   const page = pages[currentPage] || {};
+  const totalPages = pages.length;
 
   return (
     <div className="recap-view-container">
       <div className="recap-header-row">
         <button className="back-btn" onClick={() => navigate(-1)}>
-          &larr; Torna indietro
+          &larr; {t("ui.viewer.back")}
         </button>
         <h2 className="recap-title">{recap.title}</h2>
         <button
@@ -68,15 +71,19 @@ function RecapViewPage() {
           onClick={handleDelete}
           style={{ visibility: recap.user_id === currentUser ? "visible" : "hidden" }}
         >
-          Elimina
+          {t("ui.viewer.delete")}
         </button>
       </div>
 
       <div className="recap-info">
         <div className="recap-card-meta" style={{ justifyContent: "center" }}>
-          <span className="recap-card-badge-author">di {recap.author_name}</span>
+          <span className="recap-card-badge-author">
+            {t("ui.recap_card.by")} {recap.author_name}
+          </span>
           <span className="recap-card-badge-theme">{recap.theme_name}</span>
-          <span className="recap-card-badge-visibility">{recap.visibility === "public" ? "Pubblico" : "Privato"}</span>
+          <span className="recap-card-badge-visibility">
+            {recap.visibility === "public" ? t("ui.recap_card.public") : t("ui.recap_card.private")}
+          </span>
         </div>
 
         <div className="recap-card-meta">
@@ -84,7 +91,7 @@ function RecapViewPage() {
             className="recap-card-badge-derived"
             style={{ visibility: recap.derived_from_recap_id ? "visible" : "hidden" }}
           >
-            Da <i>{recap.derived_from_author}</i>
+            {t("ui.recap_card.from")} <i>{recap.derived_from_author}</i>
           </span>
         </div>
       </div>
@@ -92,7 +99,7 @@ function RecapViewPage() {
         <div className="recap-slideshow-img-wrapper" style={{ position: "relative" }}>
           <img
             src={page.background_image_url || FALLBACK_IMAGE_URL}
-            alt={"Pagina " + (currentPage + 1)}
+            alt={t("ui.viewer.page_alt", { page: currentPage + 1 })}
             className="recap-slideshow-img"
             style={{ width: "100%", borderRadius: "16px", boxShadow: "0 4px 24px rgba(15,118,110,0.10)" }}
           />
@@ -161,17 +168,17 @@ function RecapViewPage() {
             onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
             disabled={currentPage === 0}
           >
-            Precedente
+            {t("ui.viewer.prev")}
           </button>
           <span className="recap-slideshow-page">
-            {currentPage + 1} / {pages.length}
+            {t("ui.viewer.page_status", { current: currentPage + 1, total: totalPages })}
           </span>
           <button
             className="recap-slideshow-btn"
             onClick={() => setCurrentPage((p) => Math.min(p + 1, pages.length - 1))}
             disabled={currentPage === pages.length - 1}
           >
-            Successiva
+            {t("ui.viewer.next")}
           </button>
         </div>
       </div>
