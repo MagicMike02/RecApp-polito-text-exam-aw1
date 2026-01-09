@@ -22,7 +22,7 @@ function HomePage() {
         showError(t("ui.home.error_title"), errorMsg);
         setLoading(false);
       });
-  }, [showError, t]);
+  }, [showError]);
 
   return (
     <div>

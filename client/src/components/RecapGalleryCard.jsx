@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 function RecapGalleryCard({ recap, showDesc = false, showUseBtn = false, showPreviewBtn = false }) {
   const { t } = useTranslation();
-  const theme = recap.theme_name || "-";
+  const theme = t(`db.themes.${recap.theme_name}`) || recap.theme_name || "-";
   const author = recap.author_name || "Tu";
   const isPublic = recap.visibility === "public";
   const isDerived = Boolean(recap.derived_from_recap_id || recap.original_summary_id);
@@ -37,9 +37,7 @@ function RecapGalleryCard({ recap, showDesc = false, showUseBtn = false, showPre
             {t("ui.recap_card.by")} {author}
           </span>
           <span className="recap-card-badge-theme">{theme}</span>
-          <span className="recap-card-badge-visibility">
-            {isPublic ? t("ui.recap_card.public") : t("ui.recap_card.private")}
-          </span>
+          <span className="recap-card-badge-visibility">{t(`ui.visibility.${recap.visibility}`)}</span>
         </div>
         <div className="recap-card-meta">
           <span className="recap-card-badge-derived" style={{ visibility: isDerived ? "visible" : "hidden" }}>

@@ -25,15 +25,13 @@ function ProfilePage() {
         showError(t("ui.profile.error_title"), errorMsg);
         setLoading(false);
       });
-  }, [showError, t]);
+  }, [showError]);
 
   return (
     <div>
       <div className="page-header">
         <h2 className="page-title">{t("ui.profile.title")}</h2>
-        <CreateRecapButton onClick={() => navigate("/create")}>
-          {t("ui.profile.create_button")}
-        </CreateRecapButton>
+        <CreateRecapButton onClick={() => navigate("/create")}>{t("ui.profile.create_button")}</CreateRecapButton>
       </div>
       <RecapList recaps={recaps} loading={loading} />
     </div>

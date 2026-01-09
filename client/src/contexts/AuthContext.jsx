@@ -30,7 +30,8 @@ export function AuthProvider({ children }) {
       setUser(user);
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      const errorKey = error.key || "network_error";
+      return { success: false, error: errorKey };
     }
   };
 

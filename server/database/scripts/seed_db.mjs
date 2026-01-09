@@ -66,10 +66,11 @@ async function seedDatabase() {
 		// ==========================================
 		console.log('\n🎨 Seeding 3 Themes...');
 
+
 		const themesRaw = [
-			{ id: 1, name: 'Viaggi', desc: 'I tuoi viaggi e avventure dell\'anno' },
-			{ id: 2, name: 'Musica', desc: 'I tuoi ascolti e concerti preferiti' },
-			{ id: 3, name: 'Libri', desc: 'Le tue letture e scoperte letterarie' }
+			{ id: 1, name: 'travel', desc: 'Your trips and adventures' },
+			{ id: 2, name: 'music', desc: 'Your favorite listens' },
+			{ id: 3, name: 'books', desc: 'Your literary discoveries' }
 		];
 
 		// Map to store Theme IDs

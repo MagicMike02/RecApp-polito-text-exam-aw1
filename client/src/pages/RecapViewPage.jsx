@@ -33,7 +33,7 @@ function RecapViewPage() {
         showError(t("ui.viewer.error_title"), errorMsg);
         setLoading(false);
       });
-  }, [id, showError, confirmAction, t]);
+  }, [id, showError]);
 
   const handleDelete = async () => {
     await confirmAction(t("ui.viewer.delete_title"), t("ui.viewer.delete_confirm"), async () => {
@@ -80,10 +80,8 @@ function RecapViewPage() {
           <span className="recap-card-badge-author">
             {t("ui.recap_card.by")} {recap.author_name}
           </span>
-          <span className="recap-card-badge-theme">{recap.theme_name}</span>
-          <span className="recap-card-badge-visibility">
-            {recap.visibility === "public" ? t("ui.recap_card.public") : t("ui.recap_card.private")}
-          </span>
+          <span className="recap-card-badge-theme">{t(`db.themes.${recap.theme_name}`)}</span>
+          <span className="recap-card-badge-visibility">{t(`ui.visibility.${recap.visibility}`)}</span>
         </div>
 
         <div className="recap-card-meta">

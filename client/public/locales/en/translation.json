@@ -11,7 +11,22 @@
 		"db_fetch_images_error": "Error fetching images.",
 		"db_fetch_image_error": "Error fetching image.",
 		"auth_required": "Authentication required.",
-		"forbidden_not_owner": "You are not the owner of this resource."
+		"forbidden_not_owner": "You are not the owner of this resource.",
+		"internal_server_error": "Server error. Please try again later.",
+		"network_error": "Network connection problem.",
+		"default": "An unexpected error occurred.",
+		"missing_fields": "Please enter username and password"
+	},
+	"db": {
+		"themes": {
+			"travel": "Travel",
+			"music": "Music",
+			"books": "Books"
+		},
+		"visibility": {
+			"public": "Public",
+			"private": "Private"
+		}
 	},
 	"ui": {
 		"nav": {
@@ -166,6 +181,10 @@
 			"min_pages": "At least 3 pages are required to create a recap!",
 			"select_background": "Page {{page}}: you must select a background",
 			"text_required": "Page {{page}}: you must enter at least one text"
+		},
+		"visibility": {
+			"public": "Public",
+			"private": "Private"
 		}
 	},
 	"notifications": {

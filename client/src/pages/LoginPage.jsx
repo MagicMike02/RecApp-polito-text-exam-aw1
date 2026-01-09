@@ -17,7 +17,7 @@ function LoginPage() {
     const password = formData.get("password");
 
     if (!username || !password) {
-      return { error: t("ui.login.missing_fields", "Please enter username and password"), prevUsername: username };
+      return { error: "missing_fields", prevUsername: username };
     }
 
     try {
@@ -26,12 +26,11 @@ function LoginPage() {
         navigate("/");
         return { error: null };
       } else {
-        const errorKey = res.error || "invalid_credentials";
-        return { error: t(`api_errors.${errorKey}`), prevUsername: username };
+        return { error: res.error, prevUsername: username };
       }
     } catch (err) {
-      const errorKey = err.backendKey || "invalid_credentials";
-      return { error: t(`api_errors.${errorKey}`), prevUsername: username };
+      const errorKey = err.key || "internal_server_error";
+      return { error: errorKey, prevUsername: username };
     }
   };
 
@@ -42,10 +41,10 @@ function LoginPage() {
       <Card className="login-card">
         <Card.Body className="login-card-body">
           <div className="login-header">
-            <h2 className="login-title">{t("ui.title")}</h2>
+            <h2 className="login-title">{t("ui.login.title")}</h2>
           </div>
 
-          {state?.error && <Alert variant="danger">{state.error}</Alert>}
+          {state?.error && <Alert variant="danger">{t(`api_errors.${state.error}`, t("api_errors.default"))}</Alert>}
 
           <Form action={formAction} className="login-form">
             <div className="login-group">

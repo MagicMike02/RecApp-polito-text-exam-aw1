@@ -92,7 +92,7 @@ function RecapEditorPage() {
     };
 
     initEditor();
-  }, [searchParams, showError, t]);
+  }, [searchParams, showError]);
 
   const updateTitle = (value) => {
     setRecapData((prev) => ({ ...prev, title: value }));

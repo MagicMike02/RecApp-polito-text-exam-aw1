@@ -11,7 +11,22 @@
 		"db_fetch_images_error": "Errore nel recupero delle immagini.",
 		"db_fetch_image_error": "Errore nel recupero dell'immagine.",
 		"auth_required": "Autenticazione richiesta.",
-		"forbidden_not_owner": "Non sei il proprietario della risorsa."
+		"forbidden_not_owner": "Non sei il proprietario della risorsa.",
+		"internal_server_error": "Errore del server. Riprova più tardi.",
+		"network_error": "Problema di connessione di rete.",
+		"default": "Si è verificato un errore inaspettato.",
+		"missing_fields": "Inserisci nome utente e password"
+	},
+	"db": {
+		"themes": {
+			"travel": "Viaggi",
+			"music": "Musica",
+			"books": "Libri"
+		},
+		"visibility": {
+			"public": "Pubblico",
+			"private": "Privato"
+		}
 	},
 	"ui": {
 		"nav": {
@@ -166,6 +181,10 @@
 			"min_pages": "Servono almeno 3 pagine per creare un riepilogo!",
 			"select_background": "Pagina {{page}}: devi selezionare un background",
 			"text_required": "Pagina {{page}}: devi inserire almeno un testo"
+		},
+		"visibility": {
+			"public": "Pubblico",
+			"private": "Privato"
 		}
 	},
 	"notifications": {

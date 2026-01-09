@@ -49,7 +49,7 @@ function CreateRecapPage() {
       }
     };
     fetchData();
-  }, [showError, t]);
+  }, [showError]);
 
   useEffect(() => {
     const fetchTemplatesAndBackgrounds = async () => {
@@ -114,7 +114,7 @@ function CreateRecapPage() {
                   className={`crp-theme-btn${selectedTheme === theme.id ? " selected" : ""}`}
                   onClick={() => setSelectedTheme(theme.id)}
                 >
-                  {theme.name}
+                  {t(`db.themes.${theme.name}`)}
                 </button>
               ))}
             </div>
@@ -130,11 +130,12 @@ function CreateRecapPage() {
                     const bg = themeBackgrounds.find((bg) => bg.id === page.background_image_id);
                     return { background_url: bg ? bg.url : "" };
                   });
+                  const selectedThemeObj = themes.find((t) => t.id === template.theme_id);
                   const fakeRecapFromTemplate = {
                     id: template.id,
                     title: template.name,
                     author_name: "Template",
-                    theme_name: themes.find((t) => t.id === template.theme_id)?.name,
+                    theme_name: selectedThemeObj?.name || "",
                     visibility: "public",
                     pages,
                     description: template.description,
@@ -149,9 +150,7 @@ function CreateRecapPage() {
 
         <Tab eventKey="recaps" title={t("ui.create_recap.tab_public_recaps")}>
           <div className="crp-create-recap-section">
-            <Alert variant="info">
-              {t("ui.create_recap.description")}
-            </Alert>
+            <Alert variant="info">{t("ui.create_recap.description")}</Alert>
             {publicRecaps.length === 0 ? (
               <Alert variant="warning">{t("ui.create_recap.no_public_recaps")}</Alert>
             ) : (
