@@ -7,7 +7,6 @@ function RecapGalleryCard({ recap, showDesc = false, showUseBtn = false, showPre
   const { t } = useTranslation();
   const theme = t(`db.themes.${recap.theme_name}`) || recap.theme_name || "-";
   const author = recap.author_name || "Tu";
-  const isPublic = recap.visibility === "public";
   const isDerived = Boolean(recap.derived_from_recap_id || recap.original_summary_id);
   const mainAuthor = recap.derived_from_author || "?";
 

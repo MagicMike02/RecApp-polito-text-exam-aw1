@@ -74,7 +74,7 @@ const writeLog = (logEntry) => {
 
 	fs.appendFile(filePath, logLine, (err) => {
 		if (err) {
-			console.error(`[Logger Error] Failed to write log: ${err.message}`);
+			//.error(`[Logger Error] Failed to write log: ${err.message}`);
 		}
 	});
 };
@@ -84,18 +84,18 @@ export const loggerMiddleware = (req, res, next) => {
 
 	// Log iniziale della richiesta su console
 	const userInfo = req.user ? `User ${req.user.id} (${req.user.username})` : 'Guest';
-	console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - ${userInfo}`);
+	//console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - ${userInfo}`);
 
 	// Log dei parametri se presenti
 	if (Object.keys(req.params || {}).length > 0) {
-		console.log(`  Params:`, req.params);
+		//console.log(`  Params:`, req.params);
 	}
 	if (Object.keys(req.query || {}).length > 0) {
-		console.log(`  Query:`, req.query);
+		//console.log(`  Query:`, req.query);
 	}
 	if (Object.keys(req.body || {}).length > 0) {
 		const sanitized = sanitizeBody(req.body);
-		console.log(`  Body:`, sanitized);
+		//	console.log(`  Body:`, sanitized);
 	}
 
 	// Intercetta il metodo end originale di res
@@ -108,7 +108,7 @@ export const loggerMiddleware = (req, res, next) => {
 		// Log della risposta su console
 		const statusColor = res.statusCode >= 400 ? '\x1b[31m' : '\x1b[32m'; // Rosso per errori, verde per successo
 		const resetColor = '\x1b[0m';
-		console.log(`  ${statusColor}Response: ${res.statusCode}${resetColor} (${duration}ms)`);
+		//console.log(`  ${statusColor}Response: ${res.statusCode}${resetColor} (${duration}ms)`);
 
 		// Chiama il metodo originale
 		return originalEnd.apply(res, args);
@@ -131,7 +131,7 @@ export const errorLoggerMiddleware = (err, req, res, next) => {
 	};
 
 	writeLog(errorLogEntry);
-	console.error('[Error Logger]', errorLogEntry);
+	//console.error('[Error Logger]', errorLogEntry);
 
 	next(err);
 };

@@ -80,7 +80,7 @@ app.get('/api/test', (req, res) => {
 	res.json({ message: 'Server funzionante!' });
 });
 
-app.use(errorLoggerMiddleware); 
+app.use(errorLoggerMiddleware);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

@@ -1,11 +1,11 @@
 export const errorHandler = (err, req, res, next) => {
-	console.error('Error occurred:', {
-		message: err.message,
-		stack: err.stack,
-		url: req.url,
-		method: req.method,
-		timestamp: new Date().toISOString()
-	});
+	// console.error('Error occurred:', {
+	// 	message: err.message,
+	// 	stack: err.stack,
+	// 	url: req.url,
+	// 	method: req.method,
+	// 	timestamp: new Date().toISOString()
+	// });
 
 	if (err.name === 'ValidationError') {
 		return res.status(400).json({

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { getTemplateById, getRecapById, getImagesByTheme, createRecap } from "../services/apiService";
+import { useNavigate, useSearchParams, useParams } from "react-router-dom";
+import { getTemplateById, getRecapById, getImagesByTheme, createRecap, updateRecap } from "../services/apiService";
 import { useNotification } from "../contexts/NotificationContext";
+import { useAuth } from "../contexts/AuthContext";
 import PagePreview from "../components/PagePreview";
 import BackgroundSelector from "../components/BackgroundSelector";
 import PageThumbnail from "../components/PageThumbnail";
@@ -13,7 +14,9 @@ function RecapEditorPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { showModal, hideModal, showToast, hideToast, showError, showSuccess, confirmAction } = useNotification();
+  const { id: paramId } = useParams();
+  const { showModal, hideModal, showToast, showError, showSuccess } = useNotification();
+  const { user, isAuthenticated } = useAuth();
 
   const [recapData, setRecapData] = useState({
     title: "",
@@ -28,18 +31,52 @@ function RecapEditorPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [deletePageIndex, setDeletePageIndex] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editRecapId, setEditRecapId] = useState(null);
 
   useEffect(() => {
     const initEditor = async () => {
       const templateId = searchParams.get("template");
       const cloneId = searchParams.get("clone");
+      const editId = paramId;
 
       try {
         setLoading(true);
 
-        if (templateId) {
+        if (editId) {
+          // Edit mode: carica recap esistente
+          const recap = await getRecapById(editId);
+
+          //  CHECK: verifica proprietario recap
+          if (!isAuthenticated || recap.user_id !== user.id) {
+            const errorMsg = t("ui.editor.forbidden_edit");
+            setError(errorMsg);
+            showError(t("ui.editor.error_title"), errorMsg);
+            setTimeout(() => navigate("/profile"), 2000);
+            setLoading(false);
+            return;
+          }
+
+          const bgImages = await getImagesByTheme(recap.theme_id);
+
+          setEditRecapId(parseInt(editId));
+          setIsEditMode(true);
+          setRecapData({
+            title: recap.title,
+            visibility: recap.visibility,
+            theme_id: recap.theme_id,
+            derived_from_recap_id: recap.derived_from_recap_id || null,
+            pages: recap.pages.map((p) => ({
+              id: p.id,
+              page_number: p.page_number,
+              background_image_id: p.background_image_id,
+              text_field_1: p.text_field_1 || "",
+              text_field_2: p.text_field_2 || "",
+              text_field_3: p.text_field_3 || "",
+            })),
+          });
+          setBackgrounds(bgImages);
+        } else if (templateId) {
           // Carica da template
           const template = await getTemplateById(templateId);
           const bgImages = await getImagesByTheme(template.theme_id);
@@ -92,7 +129,7 @@ function RecapEditorPage() {
     };
 
     initEditor();
-  }, [searchParams, showError]);
+  }, [searchParams, showError, t, paramId]);
 
   const updateTitle = (value) => {
     setRecapData((prev) => ({ ...prev, title: value }));
@@ -140,27 +177,28 @@ function RecapEditorPage() {
       return;
     }
 
-    setDeletePageIndex(index);
     showModal(
       "confirm",
       t("ui.editor.delete_page_title"),
       t("ui.editor.delete_page_confirm", { page: index + 1 }),
       async () => {
-        setIsDeleting(true);
         setTimeout(() => {
           const newPages = recapData.pages.filter((_, i) => i !== index);
-          setRecapData((prev) => ({ ...prev, pages: newPages }));
+          // Aggiorna i numeri di pagina dopo l'eliminazione
+          const pagesWithUpdatedNumbers = newPages.map((page, idx) => ({
+            ...page,
+            page_number: idx + 1,
+          }));
+          setRecapData((prev) => ({ ...prev, pages: pagesWithUpdatedNumbers }));
 
-          // Aggiusta l'indice corrente se necessario
-          if (currentPageIndex >= newPages.length) {
-            setCurrentPageIndex(newPages.length - 1);
+          //aggiusto indice pagina
+          if (currentPageIndex >= pagesWithUpdatedNumbers.length) {
+            setCurrentPageIndex(pagesWithUpdatedNumbers.length - 1);
           } else if (currentPageIndex === index && index > 0) {
             setCurrentPageIndex(index - 1);
           }
 
           hideModal();
-          setIsDeleting(false);
-          setDeletePageIndex(null);
 
           showToast("success", t("ui.editor.done"), t("ui.editor.page_deleted"));
         }, 300);
@@ -174,6 +212,7 @@ function RecapEditorPage() {
 
     const newPages = [...recapData.pages];
     [newPages[fromIndex], newPages[toIndex]] = [newPages[toIndex], newPages[fromIndex]];
+
     setRecapData((prev) => ({ ...prev, pages: newPages }));
 
     // Aggiorna l'indice corrente se la pagina selezionata è stata mossa
@@ -221,21 +260,38 @@ function RecapEditorPage() {
     }
 
     try {
+      // Prepara i dati per l'API
       setSaving(true);
 
-      // Prepara i dati per l'API
+      // Aggiorna i page_number in base all'ordine attuale
+      const pagesWithCorrectNumbers = recapData.pages.map((page, idx) => ({
+        ...page,
+        page_number: idx + 1,
+      }));
+
       const payload = {
         ...recapData,
+        pages: pagesWithCorrectNumbers,
         derived_from_recap_id: recapData.derived_from_recap_id || undefined,
       };
 
-      await createRecap(payload);
+      if (isEditMode) {
+        // recap esistente - update
+        await updateRecap(editRecapId, payload);
+        showSuccess(t("ui.editor.success_title"), t("notifications.recap_updated_success"));
 
-      showSuccess(t("ui.editor.success_title"), t("notifications.recap_created_success"));
+        setTimeout(() => {
+          navigate("/profile");
+        }, 2000);
+      } else {
+        // crea recap nuovo
+        await createRecap(payload);
+        showSuccess(t("ui.editor.success_title"), t("notifications.recap_created_success"));
 
-      setTimeout(() => {
-        navigate("/profile");
-      }, 2000);
+        setTimeout(() => {
+          navigate("/profile");
+        }, 2000);
+      }
     } catch (err) {
       // Cerca di estrarre messaggio di errore dall'API
       let errorMsg = t("ui.editor.error_saving");
@@ -434,7 +490,11 @@ function RecapEditorPage() {
             onClick={handleSave}
             disabled={saving || recapData.pages.length < 3}
           >
-            {saving ? t("ui.editor.saving") : t("ui.editor.save_button")}
+            {saving
+              ? t("ui.editor.saving")
+              : isEditMode
+              ? t("ui.editor.save_changes_button")
+              : t("ui.editor.save_button")}
           </button>
           <button className="btn btn-outline-nav w-100" onClick={() => navigate(-1)} disabled={saving}>
             {t("ui.actions.cancel")}

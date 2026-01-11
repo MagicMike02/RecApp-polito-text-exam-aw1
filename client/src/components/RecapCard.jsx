@@ -7,7 +7,6 @@ function RecapCard({ recap }) {
   const { t } = useTranslation();
   const coverUrl =
     (recap.pages && recap.pages[0] && (recap.pages[0].background_image_url || recap.pages[0].background_url)) || "";
-  const isPublic = recap.visibility === "public";
   const theme = t(`db.themes.${recap.theme_name?.toLowerCase() || ""}`) || recap.theme_name || "-";
   const author = recap.author_name || "Tu";
   const isDerived = Boolean(recap.derived_from_recap_id || recap.original_summary_id);

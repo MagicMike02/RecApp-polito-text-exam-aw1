@@ -10,7 +10,7 @@ router.get('/public', async (req, res) => {
 		const recaps = await recapDao.getPublicRecaps();
 		res.json({ success: true, data: recaps });
 	} catch (error) {
-		console.error('Error fetching public recaps:', error);
+		//console.error('Error fetching public recaps:', error);
 		res.status(500).json({ success: false, error: 'fetch_public_recaps_error', message: 'Error fetching public recaps' });
 	}
 });
@@ -20,7 +20,7 @@ router.get('/my', isAuthenticated, async (req, res) => {
 		const recaps = await recapDao.getRecapsByUser(req.user.id);
 		res.json({ success: true, data: recaps });
 	} catch (error) {
-		console.error('Error fetching user recaps:', error);
+		//console.error('Error fetching user recaps:', error);
 		res.status(500).json({ success: false, error: 'fetch_user_recaps_error', message: 'Error fetching user recaps' });
 	}
 });
@@ -35,9 +35,13 @@ router.get('/:id', validateRecapId, async (req, res) => {
 			return res.status(404).json({ success: false, error: 'recap_not_found', message: 'Recap not found' });
 		}
 
+		if (recap.visibility === 'private' && recap.user_id !== userId) {
+			return res.status(404).json({ success: false, error: 'recap_not_found', message: 'Recap not found' });
+		}
+
 		res.json({ success: true, data: recap });
 	} catch (error) {
-		console.error('Error fetching recap:', error);
+		//console.error('Error fetching recap:', error);
 		res.status(500).json({ success: false, error: 'fetch_recap_error', message: 'Error fetching recap' });
 	}
 });
@@ -84,7 +88,7 @@ router.post('/', isAuthenticated, validateCreateRecap, async (req, res) => {
 		const newRecap = await recapDao.getRecapById(recapId);
 		res.status(201).json({ success: true, data: newRecap });
 	} catch (error) {
-		console.error('Error creating recap:', error);
+		//.error('Error creating recap:', error);
 		res.status(500).json({ success: false, error: 'create_recap_error', message: 'Error creating recap' });
 	}
 });
@@ -92,7 +96,7 @@ router.post('/', isAuthenticated, validateCreateRecap, async (req, res) => {
 router.put('/:id', isAuthenticated, validateUpdateRecap, async (req, res) => {
 	try {
 		const { id } = req.params;
-		const recap = await recapDao.getRecapById(parseInt(id));
+		const recap = await recapDao.getRecapById(parseInt(id), req.user.id);
 
 		if (!recap) {
 			return res.status(404).json({ success: false, error: 'recap_not_found', message: 'Recap not found' });
@@ -105,27 +109,19 @@ router.put('/:id', isAuthenticated, validateUpdateRecap, async (req, res) => {
 		const { title, visibility, pages } = req.body;
 
 		if (title || visibility) {
-			await recapDao.updateRecap(parseInt(id), { title, visibility });
+			await recapDao.updateRecap(parseInt(id), req.user.id, { title, visibility });
 		}
 
 		if (pages) {
-			await recapDao.deleteRecapPages(parseInt(id));
-			for (const page of pages) {
-				await recapDao.createRecapPage({
-					recap_id: parseInt(id),
-					page_number: page.page_number,
-					background_image_id: page.background_image_id,
-					text_field_1: page.text_field_1 || null,
-					text_field_2: page.text_field_2 || null,
-					text_field_3: page.text_field_3 || null
-				});
-			}
+
+			await recapDao.updateRecapPages(parseInt(id), pages);
 		}
 
-		const updatedRecap = await recapDao.getRecapById(parseInt(id));
+		const updatedRecap = await recapDao.getRecapById(parseInt(id), req.user.id);
 		res.json({ success: true, data: updatedRecap });
 	} catch (error) {
-		console.error('Error updating recap:', error);
+		//console.error('Error updating recap:', error.message);
+		//console.error('Error stack:', error.stack);
 		res.status(500).json({ success: false, error: 'update_recap_error', message: 'Error updating recap' });
 	}
 });
@@ -150,7 +146,7 @@ router.delete('/:id', isAuthenticated, validateRecapId, async (req, res) => {
 		}
 		res.json({ success: true, data: { message: 'Recap deleted successfully' } });
 	} catch (error) {
-		console.error('Error deleting recap:', error);
+		//console.error('Error deleting recap:', error);
 		res.status(500).json({ success: false, error: 'delete_recap_error', message: 'Error deleting recap' });
 	}
 });

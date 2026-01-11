@@ -13,7 +13,7 @@ export const NotificationManager = () => {
       try {
         await modal.onConfirm();
       } catch (error) {
-        console.error("Errore nella conferma:", error);
+        //console.error("Errore nella conferma:", error);
       } finally {
         stopLoading();
         hideModal();

@@ -14,7 +14,7 @@ router.get('/:id', validateTemplateId, async (req, res) => {
 		}
 		res.json({ success: true, data: template });
 	} catch (error) {
-		console.error('Error fetching template:', error);
+		//console.error('Error fetching template:', error);
 		res.status(500).json({ success: false, error: 'db_fetch_template_error', message: error.message });
 	}
 });

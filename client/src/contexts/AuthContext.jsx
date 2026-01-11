@@ -39,7 +39,7 @@ export function AuthProvider({ children }) {
     try {
       await API.logout();
     } catch (error) {
-      console.error("Logout error:", error);
+      //console.error("Logout error:", error);
     } finally {
       setUser(null);
     }

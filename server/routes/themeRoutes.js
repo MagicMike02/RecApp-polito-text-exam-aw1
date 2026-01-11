@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
 		const themes = await themeDao.getAllThemes();
 		res.json({ success: true, data: themes });
 	} catch (error) {
-		console.error('Error fetching themes:', error);
+		//console.error('Error fetching themes:', error);
 		res.status(500).json({ success: false, error: 'db_fetch_themes_error', message: error.message });
 	}
 });
@@ -27,7 +27,7 @@ router.get('/:id', validateId, async (req, res) => {
 
 		res.json({ success: true, data: theme });
 	} catch (error) {
-		console.error('Error fetching theme:', error);
+		//console.error('Error fetching theme:', error);
 		res.status(500).json({ success: false, error: 'db_fetch_theme_error', message: error.message });
 	}
 });
@@ -38,7 +38,7 @@ router.get('/:themeId/templates', validateThemeId, async (req, res) => {
 		const templates = await templateDao.getTemplatesByTheme(parseInt(themeId));
 		res.json({ success: true, data: templates });
 	} catch (error) {
-		console.error('Error fetching templates:', error);
+		//console.error('Error fetching templates:', error);
 		res.status(500).json({ success: false, error: 'db_fetch_templates_error', message: error.message });
 	}
 });
@@ -54,7 +54,7 @@ router.get('/templates/:id', validateTemplateId, async (req, res) => {
 
 		res.json({ success: true, data: template });
 	} catch (error) {
-		console.error('Error fetching template:', error);
+		//console.error('Error fetching template:', error);
 		res.status(500).json({ success: false, error: 'db_fetch_template_error', message: error.message });
 	}
 });

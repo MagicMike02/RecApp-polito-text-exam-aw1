@@ -10,7 +10,7 @@ export async function openDatabase() {
 
 	// Ensure foreign key constraints are enabled
 	await db.exec('PRAGMA foreign_keys = ON;');
-	console.log('PRAGMA foreign_keys set to ON'); // Debugging log
+	// console.log('PRAGMA foreign_keys set to ON'); // Debugging log
 
 	return db;
 }

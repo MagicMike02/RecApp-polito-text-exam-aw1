@@ -8,6 +8,7 @@ const apiClient = axios.create({
 		'Content-Type': 'application/json',
 	},
 	withCredentials: true,
+	validateStatus: () => true, // Non logga nessuno status come errore di rete
 });
 
 // Centralized response interceptor for unwrapping and error handling
@@ -24,7 +25,6 @@ apiClient.interceptors.response.use(
 				return Promise.reject(err);
 			}
 		}
-		// Fallback: reject generic error
 		return Promise.reject(new Error('Unknown API response format'));
 	},
 	(error) => {
@@ -41,22 +41,15 @@ apiClient.interceptors.response.use(
 
 async function apiCall(endpoint, options = {}) {
 	const { method = 'GET', data, params, headers } = options;
-
-	try {
-		console.log(`[API] ${method} ${endpoint}`, data || params);
-		const result = await apiClient.request({
-			url: endpoint,
-			method,
-			data,
-			params,
-			headers,
-		});
-		console.log(`[API SUCCESS] ${method} ${endpoint}`, result);
-		return result;
-	} catch (error) {
-		console.error(`[API EXCEPTION] ${method} ${endpoint}:`, error.message);
-		throw error;
-	}
+	// console.log(`[API] ${method} ${endpoint}`, data || params);
+	return apiClient.request({
+		url: endpoint,
+		method,
+		data,
+		params,
+		headers,
+	});
+	// console.log(`[API SUCCESS] ${method} ${endpoint}`, result);
 }
 
 // ==================== AUTH API ====================

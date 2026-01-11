@@ -34,6 +34,27 @@ export const validateCreateRecap = [
 		.isInt({ min: 1 })
 		.withMessage('Derived from recap ID must be a positive integer'),
 
+	body('pages.*.text_field_1')
+		.optional()
+		.isString()
+		.trim()
+		.isLength({ max: 500 })
+		.withMessage('Text field 1 cannot exceed 500 characters'),
+
+	body('pages.*.text_field_2')
+		.optional()
+		.isString()
+		.trim()
+		.isLength({ max: 500 })
+		.withMessage('Text field 2 cannot exceed 500 characters'),
+
+	body('pages.*.text_field_3')
+		.optional()
+		.isString()
+		.trim()
+		.isLength({ max: 500 })
+		.withMessage('Text field 3 cannot exceed 500 characters'),
+
 	(req, res, next) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
@@ -65,6 +86,37 @@ export const validateUpdateRecap = [
 		.optional()
 		.isArray({ min: CONSTRAINTS.MIN_PAGES })
 		.withMessage(`Minimum ${CONSTRAINTS.MIN_PAGES} pages required`),
+
+	body('pages.*.page_number')
+		.optional()
+		.isInt({ min: 1 })
+		.withMessage('Page number must be a positive integer'),
+
+	body('pages.*.background_image_id')
+		.optional()
+		.isInt({ min: 1 })
+		.withMessage('Background image ID must be a positive integer'),
+
+	body('pages.*.text_field_1')
+		.optional()
+		.isString()
+		.trim()
+		.isLength({ max: 500 })
+		.withMessage('Text field 1 cannot exceed 500 characters'),
+
+	body('pages.*.text_field_2')
+		.optional()
+		.isString()
+		.trim()
+		.isLength({ max: 500 })
+		.withMessage('Text field 2 cannot exceed 500 characters'),
+
+	body('pages.*.text_field_3')
+		.optional()
+		.isString()
+		.trim()
+		.isLength({ max: 500 })
+		.withMessage('Text field 3 cannot exceed 500 characters'),
 
 	(req, res, next) => {
 		const errors = validationResult(req);

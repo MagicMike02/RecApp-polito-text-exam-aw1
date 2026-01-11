@@ -78,9 +78,9 @@ function LoginPage() {
               {isPending ? t("ui.login.loading") : t("ui.login.submit")}
             </Button>
           </Form>
-          <div className="login-footer">
+          {/* <div className="login-footer">
             <small className="text-muted">{t("ui.login.test_info")}</small>
-          </div>
+          </div> */}
         </Card.Body>
       </Card>
     </Container>

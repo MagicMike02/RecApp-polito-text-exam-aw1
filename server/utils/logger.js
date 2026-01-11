@@ -1,3 +1,17 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const logDir = path.join(__dirname, '..', 'log');
+
+// Ensure log directory exists
+if (!fs.existsSync(logDir)) {
+	fs.mkdirSync(logDir, { recursive: true });
+}
+
+const logFile = path.join(logDir, `app-${new Date().toISOString().split('T')[0]}.log`);
+
 const LOG_LEVELS = {
 	ERROR: 'ERROR',
 	WARN: 'WARN',
@@ -14,22 +28,36 @@ const formatLog = (level, message, meta = {}) => {
 	};
 };
 
+const writeToFile = (logEntry) => {
+	try {
+		fs.appendFileSync(logFile, JSON.stringify(logEntry) + '\n', 'utf-8');
+	} catch (error) { }
+};
+
 export const logger = {
 	error: (message, meta) => {
-		console.error(JSON.stringify(formatLog(LOG_LEVELS.ERROR, message, meta)));
+		const logEntry = formatLog(LOG_LEVELS.ERROR, message, meta);
+		// console.error(JSON.stringify(logEntry));
+		writeToFile(logEntry);
 	},
 
 	warn: (message, meta) => {
-		console.warn(JSON.stringify(formatLog(LOG_LEVELS.WARN, message, meta)));
+		const logEntry = formatLog(LOG_LEVELS.WARN, message, meta);
+		// console.warn(JSON.stringify(logEntry));
+		writeToFile(logEntry);
 	},
 
 	info: (message, meta) => {
-		console.log(JSON.stringify(formatLog(LOG_LEVELS.INFO, message, meta)));
+		const logEntry = formatLog(LOG_LEVELS.INFO, message, meta);
+		// console.log(JSON.stringify(logEntry));
+		writeToFile(logEntry);
 	},
 
 	debug: (message, meta) => {
 		if (process.env.NODE_ENV !== 'production') {
-			console.log(JSON.stringify(formatLog(LOG_LEVELS.DEBUG, message, meta)));
+			const logEntry = formatLog(LOG_LEVELS.DEBUG, message, meta);
+			// console.log(JSON.stringify(logEntry));
+			writeToFile(logEntry);
 		}
 	}
 };

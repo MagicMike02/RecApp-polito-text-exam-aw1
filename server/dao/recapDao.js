@@ -218,16 +218,72 @@ export async function updateRecapPage(id, { background_image_id, text_field_1, t
 	}
 }
 
+export async function updateRecapPages(recapId, pages) {
+	const db = await openDatabase();
+	try {
+		// Get existing pages for this recap
+		const existingPages = await db.all(
+			`SELECT id FROM recap_pages WHERE recap_id = ? ORDER BY page_number`,
+			[recapId]
+		);
+
+		const existingIds = existingPages.map(p => p.id);
+		const incomingIds = pages.filter(p => p.id).map(p => p.id);
+
+		// Update existing pages - use temporary negative page_numbers to avoid UNIQUE constraint
+		for (let i = 0; i < pages.length; i++) {
+			const page = pages[i];
+			if (page.id && existingIds.includes(page.id)) {
+				// Use negative page_number temporarily to avoid conflicts
+				await db.run(
+					`UPDATE recap_pages 
+				SET background_image_id = ?, text_field_1 = ?, text_field_2 = ?, text_field_3 = ?, page_number = ?
+				WHERE id = ? AND recap_id = ?`,
+					[page.background_image_id, page.text_field_1 || null, page.text_field_2 || null, page.text_field_3 || null, -(i + 1), page.id, recapId]
+				);
+			}
+		}
+
+		// Then update with the correct page numbers
+		for (let i = 0; i < pages.length; i++) {
+			const page = pages[i];
+			if (page.id && existingIds.includes(page.id)) {
+				await db.run(
+					`UPDATE recap_pages SET page_number = ? WHERE id = ? AND recap_id = ?`,
+					[i + 1, page.id, recapId]
+				);
+			} else if (!page.id) {
+				// Insert new pages
+				await db.run(
+					`INSERT INTO recap_pages (recap_id, page_number, background_image_id, text_field_1, text_field_2, text_field_3)
+				VALUES (?, ?, ?, ?, ?, ?)`,
+					[recapId, i + 1, page.background_image_id, page.text_field_1 || null, page.text_field_2 || null, page.text_field_3 || null]
+				);
+			}
+		}
+
+		// Delete pages that were removed
+		const pagesToDelete = existingIds.filter(id => !incomingIds.includes(id));
+		for (const pageId of pagesToDelete) {
+			await db.run(`DELETE FROM recap_pages WHERE id = ? AND recap_id = ?`, [pageId, recapId]);
+		}
+
+		return true;
+	} finally {
+		await db.close();
+	}
+}
+
 export async function deleteRecap(id, userId) {
 	const db = await openDatabase();
 	try {
-		console.log('Attempting to delete recap with id:', id, 'and userId:', userId);
+		// console.log('Attempting to delete recap with id:', id, 'and userId:', userId);
 		// Delete the recap itself
 		const result = await db.run(
 			'DELETE FROM recaps WHERE id = ? AND user_id = ?;',
 			[id, userId]
 		);
-		console.log('Delete result:', result);
+		// console.log('Delete result:', result);
 		return result.changes > 0;
 	} finally {
 		await db.close();

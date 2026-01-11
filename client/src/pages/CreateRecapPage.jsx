@@ -49,7 +49,7 @@ function CreateRecapPage() {
       }
     };
     fetchData();
-  }, [showError]);
+  }, [showError]); 
 
   useEffect(() => {
     const fetchTemplatesAndBackgrounds = async () => {

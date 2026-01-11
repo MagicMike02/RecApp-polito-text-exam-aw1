@@ -53,7 +53,16 @@ function RecapViewPage() {
         <Spinner animation="border" role="status" />
       </div>
     );
-  if (!recap) return null;
+  if (!recap)
+    return (
+      <div className="text-center mt-5 p-5">
+        <h4>{t("ui.viewer.not_found_title")}</h4>
+        <p>{t("ui.viewer.not_found_msg")}</p>
+        <button className="back-btn" onClick={() => navigate("/")}>
+          {t("ui.viewer.back_home")}
+        </button>
+      </div>
+    );
 
   const pages = recap.pages || [];
   const page = pages[currentPage] || {};
@@ -66,13 +75,22 @@ function RecapViewPage() {
           &larr; {t("ui.viewer.back")}
         </button>
         <h2 className="recap-title">{recap.title}</h2>
-        <button
-          className="delete-btn"
-          onClick={handleDelete}
-          style={{ visibility: recap.user_id === currentUser ? "visible" : "hidden" }}
-        >
-          {t("ui.viewer.delete")}
-        </button>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <button
+            className="edit-btn"
+            onClick={() => navigate(`/editor/${id}`)}
+            style={{ visibility: recap.user_id === currentUser ? "visible" : "hidden" }}
+          >
+            {t("ui.viewer.edit")}
+          </button>
+          <button
+            className="delete-btn"
+            onClick={handleDelete}
+            style={{ visibility: recap.user_id === currentUser ? "visible" : "hidden" }}
+          >
+            {t("ui.viewer.delete")}
+          </button>
+        </div>
       </div>
 
       <div className="recap-info">

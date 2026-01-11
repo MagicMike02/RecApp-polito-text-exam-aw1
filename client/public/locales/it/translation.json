@@ -129,6 +129,7 @@
 			"new_title": "Nuovo {{name}}",
 			"copy_title": "Copia di {{title}}",
 			"invalid_params": "Parametri non validi. Usa ?template=ID o ?clone=ID",
+			"forbidden_edit": "Non hai i permessi per modificare questo riepilogo.",
 			"error_title": "Errore",
 			"error_loading": "Errore durante il caricamento",
 			"error_saving": "Errore durante il salvataggio",
@@ -158,7 +159,8 @@
 			"text3_placeholder": "Inserisci il terzo testo...",
 			"choose_background": "Scegli Background",
 			"saving": "Salvataggio...",
-			"save_button": "Salva Riepilogo"
+			"save_button": "Crea Riepilogo",
+			"save_changes_button": "Salva Modifiche"
 		},
 		"viewer": {
 			"error_loading": "Errore nel caricamento del recap.",
@@ -168,7 +170,11 @@
 			"delete_success_title": "Recap eliminato",
 			"delete_success_msg": "Il recap è stato eliminato con successo.",
 			"delete_error": "Errore durante l'eliminazione: {{msg}}",
+			"not_found_title": "Recap non trovato",
+			"not_found_msg": "Il recap che stai cercando non esiste o non hai i permessi per vederlo.",
+			"back_home": "Torna in Home",
 			"back": "Torna indietro",
+			"edit": "Modifica",
 			"delete": "Elimina",
 			"page_alt": "Pagina {{page}}",
 			"prev": "Precedente",
@@ -188,6 +194,7 @@
 		}
 	},
 	"notifications": {
-		"recap_created_success": "Riepilogo creato con successo!"
+		"recap_created_success": "Riepilogo creato con successo!",
+		"recap_updated_success": "Riepilogo modificato con successo!"
 	}
 }
