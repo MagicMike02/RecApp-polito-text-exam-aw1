@@ -30,6 +30,13 @@
 
   --transition-fast: all 0.2s;
   --transition-medium: all 0.3s;
+
+  /* --- LANGUAGE SWITCHER SLIDER COLORS --- */
+  --lang-switch-slider-bg: #cbd5e1;
+  --lang-switch-slider-it: #14b8a6;
+  --lang-switch-slider-en: #7dd3fc;
+  --lang-switch-slider-knob: #fff;
+  --lang-switch-slider-label: #475569;
 }
 
 body {

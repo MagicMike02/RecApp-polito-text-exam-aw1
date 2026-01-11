@@ -11,7 +11,7 @@
   position: relative;
   width: 70px;
   height: 32px;
-  background-color: #cbd5e1;
+  background-color: var(--lang-switch-slider-bg);
   border-radius: 20px;
   display: flex;
   justify-content: space-between;
@@ -23,7 +23,7 @@
 .lang-label {
   font-size: 10px;
   font-weight: bold;
-  color: #475569;
+  color: var(--lang-switch-slider-label);
 }
 
 .lang-slider {
@@ -31,7 +31,7 @@
   left: 4px;
   width: 24px;
   height: 24px;
-  background-color: white;
+  background-color: var(--lang-switch-slider-knob);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -42,7 +42,7 @@
 }
 
 .en-active {
-  background-color: #3b82f6;
+  background-color: var(--lang-switch-slider-en);
 }
 .en-active .lang-slider {
   transform: translateX(38px);
@@ -52,7 +52,7 @@
 }
 
 .it-active {
-  background-color: #22c55e; /* Verde */
+  background-color: var(--lang-switch-slider-it);
 }
 .it-active .lang-slider {
   transform: translateX(0);
