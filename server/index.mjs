@@ -18,7 +18,6 @@ import recapRoutes from './routes/recapRoutes.js';
 const app = express();
 
 app.use(loggerMiddleware);
-
 app.use(requestLogger);
 app.use(express.json());
 app.use(cors({

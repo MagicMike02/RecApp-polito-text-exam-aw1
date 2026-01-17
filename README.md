@@ -1,5 +1,3 @@
-## Student: S362010 LIQUINDOLI MICHELE
-
 ## React Client Application Routes
 
 | Route         | Component       | Description                                                                                              |
